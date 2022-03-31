@@ -12,12 +12,30 @@ let refineTX, refinteTY, refineBX, refineBY;
 
 let lumon;
 
+let nope = false;
+let nopeImg;
+let nopeTime = 0;
+
+let mdeGIF = [];
+let mde = false;
+let mdeDone = false;
+let mdeTime = 0;
+
 function preload() {
   lumon = loadImage('lumon.png');
+  nopeImg = loadImage('nope.png');
+  mdeGIF[0] = loadImage('mde.gif');
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+
+  // for (let i = 0; i < 1; i++) {
+  //   loadImage('mde.gif', (img) => {
+  //     mdeGIF[i] = img;
+  //   });
+  // }
+
   r = (height - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
@@ -79,15 +97,28 @@ function mouseReleased() {
     }
   } else {
     refinery = [];
+    nope = true;
+    nopeTime = millis();
   }
 }
 
 function draw() {
+  colorMode(RGB);
   let sum = 0;
   for (let bin of refined) {
     sum += bin.count;
   }
   let percent = sum / goal;
+
+  if (percent >= 0.75 && !mde && !mdeDone) {
+    mde = true;
+    mdeTime = millis();
+  }
+
+  if (millis() - mdeTime > 5 * 1000) {
+    mdeDone = true;
+    mde = false;
+  }
 
   background(0);
   textFont('Courier');
@@ -96,7 +127,47 @@ function draw() {
   drawNumbers();
   drawBottom();
 
+  imageMode(CORNER);
   image(lumon, width - lumon.width, 0);
+  if (nope) {
+    imageMode(CENTER);
+    image(nopeImg, width * 0.5, height * 0.5);
+    if (millis() - nopeTime > 2000) {
+      nope = false;
+    }
+  }
+
+  if (mde) {
+    colorMode(HSB);
+    let dim = 5;
+    let yoff = 100;
+    let inc = 0;
+    let index = 0;
+    for (let i = 0; i < dim; i++) {
+      let xoff = 100;
+      for (let j = 0; j < dim; j++) {
+        let w = width / dim;
+        let h = height / dim;
+        noStroke();
+        rectMode(CORNER);
+        let hu = map(osn.noise3D(xoff, yoff, zoff * 2), -1, 1, -100, 500);
+        fill(hu, 255, 255, 0.2);
+        stroke(hu, 255, 255);
+        strokeWeight(4);
+        image(mdeGIF[0], i * w, j * h, w, h);
+        index++;
+        rect(i * w, j * h, w, h);
+        xoff += 5;
+      }
+      yoff += 5;
+    }
+  }
+  // push();
+  // imageMode(CENTER);
+  // translate(width * 0.5, height * 0.5);
+  // rotate(frameCount * 0.05);
+  // image(mdeGIF, 0, 0);
+  // pop();
 }
 
 function drawTop(percent) {
