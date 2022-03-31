@@ -210,6 +210,7 @@ function drawTop(percent) {
   let w = width * 0.9;
   strokeWeight(2);
   let wx = (width - w) * 0.5;
+  noFill();
   rect(wx, 25, w, 50);
   noStroke();
   fill(255);

@@ -37,6 +37,7 @@ class Bin {
   }
 
   show() {
+    push();
     this.count =
       this.levels.WO + this.levels.FC + this.levels.DR + this.levels.MA;
 
@@ -128,5 +129,6 @@ class Bin {
 
       if (millis() - this.showTime > 1000) this.showLevels = false;
     }
+    pop();
   }
 }
