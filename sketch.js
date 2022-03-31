@@ -115,7 +115,7 @@ function draw() {
     mdeTime = millis();
   }
 
-  if (millis() - mdeTime > 5 * 1000) {
+  if (millis() - mdeTime > 5 * 1000 && mde) {
     mdeDone = true;
     mde = false;
   }
