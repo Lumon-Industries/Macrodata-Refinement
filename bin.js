@@ -1,14 +1,16 @@
 class Bin {
-  constructor(w, i) {
+  constructor(w, i, goal) {
     this.w = w;
     this.i = i;
     this.x = i * w + w * 0.5;
     this.y = height - buffer * 0.6;
     this.count = 0;
+    this.goal = goal;
   }
 
   show() {
-    let perc = this.count / (goal / refined.length);
+    this.count = constrain(this.count, 0, this.goal);
+    let perc = this.count / this.goal;
     rectMode(CENTER);
     let rw = this.w - this.w * 0.25;
     stroke(255);

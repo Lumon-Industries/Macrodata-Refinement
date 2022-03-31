@@ -27,15 +27,7 @@ function preload() {
   mdeGIF[0] = loadImage('mde.gif');
 }
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-
-  // for (let i = 0; i < 1; i++) {
-  //   loadImage('mde.gif', (img) => {
-  //     mdeGIF[i] = img;
-  //   });
-  // }
-
+function startOver() {
   r = (height - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
@@ -53,13 +45,30 @@ function setup() {
 
   for (let i = 0; i < 5; i++) {
     const w = width / 5;
-    refined[i] = new Bin(w, i);
+    refined[i] = new Bin(w, i, goal / 5);
   }
+
+  mde = false;
+  mdeDone = false;
+  mdeTime = 0;
+  nopeTime = 0;
+  nope = false;
 }
 let zoff = 0;
 
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+
+  // for (let i = 0; i < 1; i++) {
+  //   loadImage('mde.gif', (img) => {
+  //     mdeGIF[i] = img;
+  //   });
+  // }
+
+  startOver();
+}
 function mousePressed() {
-  if (!refining) {
+  if (!refining && !mde) {
     refineTX = mouseX;
     refineTY = mouseY;
     refineBX = mouseX;
@@ -91,7 +100,13 @@ function mouseReleased() {
   }
   // half of numbers must be refinable
   if (countRed > 0.5 * total) {
-    const bin = random(refined);
+    const options = [];
+    for (let bin of refined) {
+      if (bin.count < bin.goal) {
+        options.push(bin);
+      }
+    }
+    const bin = random(options);
     for (let num of refinery) {
       num.refine(bin);
     }
@@ -118,6 +133,10 @@ function draw() {
   if (millis() - mdeTime > 5 * 1000 && mde) {
     mdeDone = true;
     mde = false;
+  }
+
+  if (percent >= 1.0) {
+    startOver();
   }
 
   background(0);
