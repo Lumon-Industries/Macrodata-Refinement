@@ -1,6 +1,6 @@
 let osn;
 
-let goal = 1000;
+let goal = 500;
 let refined = [];
 let numbers = [];
 let r, baseSize;
@@ -104,10 +104,17 @@ function drawTop(percent) {
   stroke(255);
   let w = width * 0.9;
   strokeWeight(2);
-  rect((width - w) * 0.5, 25, w, 50);
+  let wx = (width - w) * 0.5;
+  rect(wx, 25, w, 50);
   noStroke();
   fill(255);
-  rect(w * (1.0 - percent) + (width - w) * 0.5, 25, w * percent, 50);
+
+  let realW = w - lumon.width * 0.4;
+  percent = 0.1;
+  let pw = realW * percent;
+
+  rect(wx + realW - pw, 25, pw, 50);
+  // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
   noFill();
   fill(0);
   stroke(255);
