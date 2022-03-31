@@ -78,10 +78,12 @@ function draw() {
   background(0);
   textFont('Courier');
 
-  let yoff = 0;
+  drawTop(percent);
+  drawNumbers();
+  drawBottom();
+}
 
-  // TOP
-
+function drawTop(percent){
   rectMode(CORNER);
   stroke(255);
   let w = width * 0.9;
@@ -97,13 +99,16 @@ function draw() {
   textSize(32);
   textFont('Arial');
   text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
+}
 
-  // NUMBERS
+function drawNumbers(){
   rectMode(CENTER);
   noFill();
   strokeWeight(1);
   rect(width * 0.5, height * 0.5, width * 2, 20 + height - buffer * 2);
   rect(width * 0.5, height * 0.5, width * 2, 30 + height - buffer * 2);
+
+  let yoff = 0;
 
   const inc = 0.1;
   for (let i = 0; i < cols; i++) {
@@ -142,8 +147,9 @@ function draw() {
     yoff += inc;
   }
   zoff += 0.01;
+}
 
-  // BOTTOM
+function drawBottom(){
   for (let i = 0; i < refined.length; i++) {
     refined[i].show();
   }
