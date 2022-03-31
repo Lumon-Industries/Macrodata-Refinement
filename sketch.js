@@ -110,7 +110,6 @@ function drawTop(percent) {
   fill(255);
 
   let realW = w - lumon.width * 0.4;
-  percent = 0.1;
   let pw = realW * percent;
 
   rect(wx + realW - pw, 25, pw, 50);
