@@ -41,7 +41,8 @@ function preload() {
 
 function startOver() {
   generateCoordinates();
-  r = (height - buffer * 2) / 10;
+  let smaller = min(width, height);
+  r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
   cols = floor(width / r);
