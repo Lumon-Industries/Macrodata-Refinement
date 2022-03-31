@@ -146,7 +146,7 @@ function drawNumbers() {
         continue;
       }
 
-      let n = osn.noise3D(xoff, yoff, zoff) - 0.5;
+      let n = osn.noise3D(xoff, yoff, zoff) - 0.4;
       if (n < 0) {
         n = 0;
         num.goHome();
@@ -170,7 +170,7 @@ function drawNumbers() {
     }
     yoff += inc;
   }
-  zoff += 0.01;
+  zoff += 0.005;
 }
 
 function drawBottom() {
