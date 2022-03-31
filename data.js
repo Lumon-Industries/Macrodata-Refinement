@@ -1,5 +1,3 @@
-const baseSize = 16;
-
 class Data {
   constructor(x, y) {
     this.num = floor(random(10));
@@ -24,8 +22,10 @@ class Data {
   goBin() {
     let targetX = width / 2;
     let targetY = height;
-    this.x = lerp(this.x, this.bin.x, 0.1);
-    this.y = lerp(this.y, this.bin.y, 0.1);
+    this.x = lerp(this.x, this.bin.x, random(0, 0.2));
+    this.y = lerp(this.y, this.bin.y, random(0, 0.2));
+    this.x += random(-5, 5);
+    this.y += random(-5, 5);
     if (dist(this.x, this.y, this.bin.x, this.bin.y) < 2) {
       this.bin.count++;
       this.num = floor(random(10));
@@ -71,5 +71,9 @@ class Data {
     textAlign(CENTER, CENTER);
     fill(this.r, this.g, this.b);
     text(this.num, this.x, this.y);
+
+    // rectMode(CENTER);
+    // noFill();
+    // square(this.x, this.y, r);
   }
 }

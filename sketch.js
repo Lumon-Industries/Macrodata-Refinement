@@ -3,7 +3,7 @@ let osn;
 let goal = 1000;
 let refined = [];
 let numbers = [];
-let r = 36;
+let r, baseSize;
 let buffer = 100;
 let cols, rows;
 
@@ -12,13 +12,16 @@ let refineTX, refinteTY, refineBX, refineBY;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  r = (height - buffer * 2) / 10;
+  baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
   cols = floor(width / r);
   rows = floor((height - buffer * 2) / r);
 
+  let wBuffer = width - cols * r;
   for (let j = 0; j < rows; j++) {
     for (let i = 0; i < cols; i++) {
-      let x = i * r + r * 0.5;
+      let x = i * r + r * 0.5 + wBuffer * 0.5;
       let y = j * r + r * 0.5 + buffer;
       numbers[i + j * cols] = new Data(x, y);
     }
@@ -53,7 +56,7 @@ function mouseReleased() {
   for (let num of numbers) {
     if (num.inside(refineTX, refineTY, refineBX, refineBY)) {
       if (num.refined) refinery.push(num);
-      else allGood = false;
+      // else allGood = false;
     }
     num.turn(255, 255, 255);
     num.refined = false;
@@ -83,7 +86,7 @@ function draw() {
   drawBottom();
 }
 
-function drawTop(percent){
+function drawTop(percent) {
   rectMode(CORNER);
   stroke(255);
   let w = width * 0.9;
@@ -101,16 +104,18 @@ function drawTop(percent){
   text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
 }
 
-function drawNumbers(){
+function drawNumbers() {
   rectMode(CENTER);
   noFill();
   strokeWeight(1);
-  rect(width * 0.5, height * 0.5, width * 2, 20 + height - buffer * 2);
-  rect(width * 0.5, height * 0.5, width * 2, 30 + height - buffer * 2);
+  line(0, buffer, width, buffer);
+  line(0, height - buffer, width, height - buffer);
+  //rect(width * 0.5, height * 0.5, width * 2, 20 + height - buffer * 2);
+  //rect(width * 0.5, height * 0.5, width * 2, 30 + height - buffer * 2);
 
   let yoff = 0;
 
-  const inc = 0.1;
+  const inc = 0.2;
   for (let i = 0; i < cols; i++) {
     let xoff = 0;
     for (let j = 0; j < rows; j++) {
@@ -122,7 +127,7 @@ function drawNumbers(){
         continue;
       }
 
-      let n = osn.noise3D(xoff, yoff, zoff) - 0.5;
+      let n = osn.noise3D(xoff, yoff, zoff) - 0.35;
       if (n < 0) {
         n = 0;
         num.goHome();
@@ -131,7 +136,7 @@ function drawNumbers(){
         num.y += random(-1, 1);
       }
 
-      let sz = n * 64 + baseSize;
+      let sz = n * baseSize * 2 + baseSize;
       let d = dist(mouseX, mouseY, num.x, num.y);
       if (d < width * 0.1) {
         //sz += map(d, 0, width * 0.1, 24, 0);
@@ -146,10 +151,10 @@ function drawNumbers(){
     }
     yoff += inc;
   }
-  zoff += 0.01;
+  zoff += 0.02;
 }
 
-function drawBottom(){
+function drawBottom() {
   for (let i = 0; i < refined.length; i++) {
     refined[i].show();
   }
