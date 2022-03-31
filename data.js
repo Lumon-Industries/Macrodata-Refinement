@@ -27,7 +27,7 @@ class Data {
     this.x += random(-5, 5);
     this.y += random(-5, 5);
     if (dist(this.x, this.y, this.bin.x, this.bin.y) < 2) {
-      this.bin.count++;
+      this.bin.addNumber();
       this.num = floor(random(10));
       this.x = this.homeX;
       this.y = this.homeY;

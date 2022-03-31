@@ -159,6 +159,8 @@ function draw() {
   drawNumbers();
   drawBottom();
 
+  drawBinned();
+
   imageMode(CORNER);
   image(lumon, width - lumon.width, 0);
   if (nope) {
@@ -310,4 +312,10 @@ function drawBottom() {
   textFont('Courier');
   textAlign(CENTER, CENTER);
   text(coordinates, width * 0.5, height - 10);
+}
+
+function drawBinned() {
+  for (let num of numbers) {
+    if (num.binIt) num.show();
+  }
 }
