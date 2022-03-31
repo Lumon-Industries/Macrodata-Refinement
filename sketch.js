@@ -10,6 +10,12 @@ let cols, rows;
 let refining = false;
 let refineTX, refinteTY, refineBX, refineBY;
 
+let lumon;
+
+function preload() {
+  lumon = loadImage('lumon.png');
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   r = (height - buffer * 2) / 10;
@@ -89,6 +95,8 @@ function draw() {
   drawTop(percent);
   drawNumbers();
   drawBottom();
+
+  image(lumon, width - lumon.width, 0);
 }
 
 function drawTop(percent) {
