@@ -51,17 +51,22 @@ function mouseDragged() {
 
 function mouseReleased() {
   refining = false;
-  allGood = true;
+  let countRed = 0;
+  let total = 0;
   let refinery = [];
   for (let num of numbers) {
     if (num.inside(refineTX, refineTY, refineBX, refineBY)) {
-      if (num.refined) refinery.push(num);
-      // else allGood = false;
+      if (num.refined) {
+        refinery.push(num);
+        countRed++;
+      }
+      total++;
     }
     num.turn(255, 255, 255);
     num.refined = false;
   }
-  if (allGood) {
+  // half of numbers must be refinable
+  if (countRed > 0.5 * total) {
     const bin = random(refined);
     for (let num of refinery) {
       num.refine(bin);
@@ -127,7 +132,7 @@ function drawNumbers() {
         continue;
       }
 
-      let n = osn.noise3D(xoff, yoff, zoff) - 0.35;
+      let n = osn.noise3D(xoff, yoff, zoff) - 0.5;
       if (n < 0) {
         n = 0;
         num.goHome();
@@ -136,7 +141,7 @@ function drawNumbers() {
         num.y += random(-1, 1);
       }
 
-      let sz = n * baseSize * 2 + baseSize;
+      let sz = n * baseSize * 4 + baseSize;
       let d = dist(mouseX, mouseY, num.x, num.y);
       if (d < width * 0.1) {
         //sz += map(d, 0, width * 0.1, 24, 0);
@@ -151,7 +156,7 @@ function drawNumbers() {
     }
     yoff += inc;
   }
-  zoff += 0.02;
+  zoff += 0.01;
 }
 
 function drawBottom() {
