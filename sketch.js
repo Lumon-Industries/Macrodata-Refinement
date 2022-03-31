@@ -312,6 +312,7 @@ function drawBottom() {
   fill(0);
   textFont('Courier');
   textAlign(CENTER, CENTER);
+  textSize(baseSize * 0.8);
   text(coordinates, width * 0.5, height - 10);
 }
 
