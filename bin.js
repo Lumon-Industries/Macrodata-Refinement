@@ -3,7 +3,7 @@ class Bin {
     this.w = w;
     this.i = i;
     this.x = i * w + w * 0.5;
-    this.y = height - buffer * 0.6;
+    this.y = height - buffer * 0.75;
     this.count = 0;
     this.goal = goal;
   }

@@ -21,6 +21,18 @@ let mde = false;
 let mdeDone = false;
 let mdeTime = 0;
 
+let coordinates = `0x6AF307 : 0x38A6B7`;
+
+function randHex() {
+  return floor(random(0, 256)).toString(16).toUpperCase();
+}
+
+function generateCoordinates() {
+  let x = randHex() + randHex() + randHex();
+  let y = randHex() + randHex() + randHex();
+  coordinates = `${x} : ${y}`;
+}
+
 function preload() {
   lumon = loadImage('lumon.png');
   nopeImg = loadImage('nope.png');
@@ -28,6 +40,7 @@ function preload() {
 }
 
 function startOver() {
+  generateCoordinates();
   r = (height - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
@@ -269,6 +282,7 @@ function drawBottom() {
   }
 
   if (refining) {
+    push();
     rectMode(CORNERS);
     stroke(255);
     noFill();
@@ -286,5 +300,14 @@ function drawBottom() {
         num.refined = false;
       }
     }
+    pop();
   }
+
+  rectMode(CORNER);
+  fill(255);
+  rect(0, height - 20, width, 20);
+  fill(0);
+  textFont('Courier');
+  textAlign(CENTER, CENTER);
+  text(coordinates, width * 0.5, height - 10);
 }
