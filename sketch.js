@@ -291,14 +291,14 @@ function draw() {
 
 function drawTop(percent) {
   rectMode(CORNER);
-  stroke(255);
+  stroke("#98faff");
   let w = width * 0.9;
   strokeWeight(2);
   let wx = (width - w) * 0.5;
   noFill();
   rect(wx, 25, w, 50);
   noStroke();
-  fill(255);
+  fill("#98faff");
 
   let realW = w - lumon.width * 0.4;
   let pw = realW * percent;
@@ -307,7 +307,7 @@ function drawTop(percent) {
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
   noFill();
   fill(0);
-  stroke(255);
+  stroke("#98faff");
   strokeWeight(4);
   textSize(32);
   textFont('Arial');
@@ -372,7 +372,7 @@ function drawBottom() {
   if (refining) {
     push();
     rectMode(CORNERS);
-    stroke(255);
+    stroke("#98faff");
     noFill();
     rect(refineTX, refineTY, refineBX, refineBY);
 
@@ -381,7 +381,7 @@ function drawBottom() {
         num.inside(refineTX, refineTY, refineBX, refineBY) &&
         num.sz > baseSize
       ) {
-        num.turn(255, 0, 0);
+        num.turn(152, 250, 255);
         num.refined = true;
       } else {
         num.turn(255, 255, 255);
@@ -392,7 +392,7 @@ function drawBottom() {
   }
 
   rectMode(CORNER);
-  fill(255);
+  fill("#98faff");
   rect(0, height - 20, width, 20);
   fill(0);
   textFont('Courier');
