@@ -392,9 +392,9 @@ function drawBottom() {
   }
 
   rectMode(CORNER);
-  fill("#98faff");
+  fill("#164c68");
   rect(0, height - 20, width, 20);
-  fill(0);
+  fill("#98faff");
   textFont('Helvetica');
   textAlign(CENTER, CENTER);
   textSize(baseSize * 0.8);
