@@ -45,13 +45,13 @@ class Bin {
     let perc = this.count / this.goal;
     rectMode(CENTER);
     let rw = this.w - this.w * 0.25;
-    stroke(255);
+    stroke("#98faff");
     strokeWeight(1);
     noFill();
     rectMode(CENTER);
     rect(this.x, this.y, rw, buffer * 0.25);
     rect(this.x, this.y + buffer * 0.3, rw, buffer * 0.25);
-    fill(255);
+    fill("#98faff");
     noStroke();
     rectMode(CORNER);
     let h = buffer * 0.25;
@@ -59,11 +59,11 @@ class Bin {
     textSize(16);
     textFont('Arial');
     textAlign(CENTER, CENTER);
-    fill(255);
+    fill("#98faff");
     noStroke();
     text(nf(this.i, 2, 0), this.x, this.y);
     textAlign(LEFT, CENTER);
-    stroke(255);
+    stroke("#98faff");
     strokeWeight(2);
     fill("#174b68");
     text(
@@ -76,14 +76,14 @@ class Bin {
       rectMode(CENTER);
       let levelH = buffer * 1.7;
       let levelY = this.y - buffer;
-      stroke(255);
+      stroke("#98faff");
       fill("#174b68");
       rect(this.x, levelY, rw, levelH);
 
       push();
       translate(this.x + rw * 0.5, height - buffer);
       rectMode(CORNER);
-      stroke(255);
+      stroke("#98faff");
       fill("#174b68");
       rotate(-PI / 4);
       rect(0, 0, width * 0.05, 10);
@@ -91,7 +91,7 @@ class Bin {
       push();
       translate(this.x - rw * 0.5 - 8, height - buffer + 8);
       rectMode(CORNER);
-      stroke(255);
+      stroke("#98faff");
       fill("#174b68");
       rotate(PI + PI / 4);
       rect(0, 0, width * 0.05, 10);
@@ -99,7 +99,7 @@ class Bin {
 
       for (let i = 1; i < 5; i++) {
         rectMode(CORNER);
-        stroke(255);
+        stroke("#98faff");
         noFill();
         rect(
           this.x - rw * 0.25,
@@ -108,7 +108,7 @@ class Bin {
           buffer * 0.15
         );
 
-        fill(255);
+        fill("#98faff");
         let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
         rect(
           this.x - rw * 0.25,
@@ -119,7 +119,7 @@ class Bin {
 
         textAlign(LEFT, CENTER);
         noStroke();
-        fill(255);
+        fill("#98faff");
         text(
           keys[i - 1],
           this.x - rw * 0.45,
