@@ -221,7 +221,7 @@ function draw() {
   }
 
   background("#164c68");
-  textFont('Courier');
+  textFont('Helvetica');
 
   drawTop(percent);
   drawNumbers();
@@ -310,7 +310,7 @@ function drawTop(percent) {
   stroke("#98faff");
   strokeWeight(4);
   textSize(32);
-  textFont('Arial');
+  textFont('Helvetica');
   text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
 }
 
@@ -395,7 +395,7 @@ function drawBottom() {
   fill("#98faff");
   rect(0, height - 20, width, 20);
   fill(0);
-  textFont('Courier');
+  textFont('Helvetica');
   textAlign(CENTER, CENTER);
   textSize(baseSize * 0.8);
   text(coordinates, width * 0.5, height - 10);
