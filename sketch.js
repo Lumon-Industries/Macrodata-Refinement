@@ -38,7 +38,7 @@ let sharedImg;
 let sharedTime = 0;
 
 // Coordinates of your data
-let coordinates = `0x6AF307 : 0x38A6B7`;
+let coordinates = `0x6AF307:0x38A6B7`;
 
 let shareDiv;
 
@@ -50,15 +50,15 @@ function randHex() {
 function generateCoordinates() {
   let x = randHex() + randHex() + randHex();
   let y = randHex() + randHex() + randHex();
-  coordinates = `${x} : ${y}`;
+  coordinates = `${x}:${y}`;
 }
 
 function preload() {
-  lumon = loadImage("lumon.png");
-  nopeImg = loadImage("nope.png");
-  completedImg = loadImage("100.png");
-  sharedImg = loadImage("clipboard.png");
-  mdeGIF[0] = loadImage("mde.gif");
+  lumon = loadImage('lumon.png');
+  nopeImg = loadImage('nope.png');
+  completedImg = loadImage('100.png');
+  sharedImg = loadImage('clipboard.png');
+  mdeGIF[0] = loadImage('mde.gif');
 }
 
 function startOver() {
@@ -108,20 +108,20 @@ function setup() {
   // Width for the share 100% button
   const shw = completedImg.width;
   const shh = completedImg.height;
-  shareDiv = createDiv("");
+  shareDiv = createDiv('');
   shareDiv.hide();
   //shareDiv.style("background-color", "#AAA");
   shareDiv.position(width * 0.5 - shw * 0.5, height * 0.5 - shh * 0.5);
-  shareDiv.style("width", `${shw}px`);
-  shareDiv.style("height", `${shh}px`);
+  shareDiv.style('width', `${shw}px`);
+  shareDiv.style('height', `${shh}px`);
   shareDiv.mousePressed(function () {
-    const msg = `I met quota at  ${coordinates}.
+    const msg = `In refining ${coordinates} I have brought glory to the company. Praise Kier.
 💯🔢🐐🧇 #Severance 🧇🐐🔢💯
 lumon-industries.com #WaffleParty`;
     // if (navigator.share) {
     //   console.log("using navigator share");
     // } else {
-    console.log("navigator share not availabe, copy to clipboard!");
+    console.log('navigator share not availabe, copy to clipboard!');
     navigator.clipboard.writeText(msg);
     shared = true;
     //}
@@ -212,7 +212,7 @@ function draw() {
     // completedTime = millis();
     completed = true;
     shareDiv.show();
-    console.log("completed!");
+    console.log('completed!');
   }
 
   if (completed && shared) {
@@ -221,7 +221,7 @@ function draw() {
   }
 
   background(0);
-  textFont("Courier");
+  textFont('Courier');
 
   drawTop(percent);
   drawNumbers();
@@ -310,7 +310,7 @@ function drawTop(percent) {
   stroke(255);
   strokeWeight(4);
   textSize(32);
-  textFont("Arial");
+  textFont('Arial');
   text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
 }
 
@@ -395,7 +395,7 @@ function drawBottom() {
   fill(255);
   rect(0, height - 20, width, 20);
   fill(0);
-  textFont("Courier");
+  textFont('Courier');
   textAlign(CENTER, CENTER);
   textSize(baseSize * 0.8);
   text(coordinates, width * 0.5, height - 10);
