@@ -220,7 +220,7 @@ function draw() {
     sharedTime = millis();
   }
 
-  background(0);
+  background("#174b68");
   textFont('Courier');
 
   drawTop(percent);
