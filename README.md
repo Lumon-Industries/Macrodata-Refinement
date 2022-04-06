@@ -6,6 +6,8 @@ From the humble beginnings of a small topical salve company to the world's leadi
 
 Welcome to the Lumon Family!
 
+https://lumon-industries.com
+
 ## How will I know what to work on?
 
 First, you wll be assigned a macrodata file. This selection has been made carefully by your superior.
