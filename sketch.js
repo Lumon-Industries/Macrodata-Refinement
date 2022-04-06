@@ -306,7 +306,7 @@ function drawTop(percent) {
   rect(wx + realW - pw, 25, pw, 50);
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
   noFill();
-  fill(0);
+  fill("#164c68");
   stroke("#98faff");
   strokeWeight(4);
   textSize(32);
