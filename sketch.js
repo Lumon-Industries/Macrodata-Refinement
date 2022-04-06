@@ -1,28 +1,48 @@
 let osn;
 
+// Total numbers to be collected
 let goal = 500;
+
+// Tracking the numbers
 let refined = [];
 let numbers = [];
 let r, baseSize;
 let buffer = 100;
 let cols, rows;
 
+// Info for refining
 let refining = false;
 let refineTX, refinteTY, refineBX, refineBY;
 
 let lumon;
 
+// Info for "nope" state
 let nope = false;
 let nopeImg;
 let nopeTime = 0;
 
+// Info for "MDE" state
 let mdeGIF = [];
 let mde = false;
 let mdeDone = false;
 let mdeTime = 0;
 
+// Info for 100% state
+let completed = false;
+let completedImg;
+let completedTime = 0;
+
+// Info for sharing
+let shared = false;
+let sharedImg;
+let sharedTime = 0;
+
+// Coordinates of your data
 let coordinates = `0x6AF307 : 0x38A6B7`;
 
+let shareDiv;
+
+// Function to pick coordinates
 function randHex() {
   return floor(random(0, 256)).toString(16).toUpperCase();
 }
@@ -34,13 +54,16 @@ function generateCoordinates() {
 }
 
 function preload() {
-  lumon = loadImage('lumon.png');
-  nopeImg = loadImage('nope.png');
-  mdeGIF[0] = loadImage('mde.gif');
+  lumon = loadImage("lumon.png");
+  nopeImg = loadImage("nope.png");
+  completedImg = loadImage("100.png");
+  sharedImg = loadImage("clipboard.png");
+  mdeGIF[0] = loadImage("mde.gif");
 }
 
 function startOver() {
   generateCoordinates();
+  // Create the space
   let smaller = min(width, height);
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
@@ -53,10 +76,12 @@ function startOver() {
     for (let i = 0; i < cols; i++) {
       let x = i * r + r * 0.5 + wBuffer * 0.5;
       let y = j * r + r * 0.5 + buffer;
+      // Initialize the number objects
       numbers[i + j * cols] = new Data(x, y);
     }
   }
 
+  // Refinement bins
   for (let i = 0; i < 5; i++) {
     const w = width / 5;
     refined[i] = new Bin(w, i, goal / 5);
@@ -67,11 +92,40 @@ function startOver() {
   mdeTime = 0;
   nopeTime = 0;
   nope = false;
+  completed = false;
+  shared = false;
+  shareDiv.hide();
 }
 let zoff = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+
+  sharedImg.resize(width * 0.5, 0);
+  nopeImg.resize(width * 0.5, 0);
+  completedImg.resize(width * 0.5, 0);
+
+  // Width for the share 100% button
+  const shw = completedImg.width;
+  const shh = completedImg.height;
+  shareDiv = createDiv("");
+  shareDiv.hide();
+  //shareDiv.style("background-color", "#AAA");
+  shareDiv.position(width * 0.5 - shw * 0.5, height * 0.5 - shh * 0.5);
+  shareDiv.style("width", `${shw}px`);
+  shareDiv.style("height", `${shh}px`);
+  shareDiv.mousePressed(function () {
+    const msg = `I met quota at  ${coordinates}.
+💯🔢🐐🧇 #Severance 🧇🐐🔢💯
+lumon-industries.com #WaffleParty`;
+    // if (navigator.share) {
+    //   console.log("using navigator share");
+    // } else {
+    console.log("navigator share not availabe, copy to clipboard!");
+    navigator.clipboard.writeText(msg);
+    shared = true;
+    //}
+  });
 
   // for (let i = 0; i < 1; i++) {
   //   loadImage('mde.gif', (img) => {
@@ -82,12 +136,14 @@ function setup() {
   startOver();
 }
 function mousePressed() {
-  if (!refining && !mde) {
+  // This is the worst if statement in the history of if statements
+  if (!refining && !mde && !completed && !shared) {
     refineTX = mouseX;
     refineTY = mouseY;
     refineBX = mouseX;
     refineBY = mouseY;
     refining = true;
+    nope = false;
   }
 }
 
@@ -126,7 +182,10 @@ function mouseReleased() {
     }
   } else {
     refinery = [];
-    nope = true;
+    // 2nd worst if statement in the history of time
+    if (!completed && !shared) {
+      nope = true;
+    }
     nopeTime = millis();
   }
 }
@@ -149,12 +208,20 @@ function draw() {
     mde = false;
   }
 
-  if (percent >= 1.0) {
-    startOver();
+  if (percent >= 1.0 && !completed && !shared) {
+    // completedTime = millis();
+    completed = true;
+    shareDiv.show();
+    console.log("completed!");
+  }
+
+  if (completed && shared) {
+    completed = false;
+    sharedTime = millis();
   }
 
   background(0);
-  textFont('Courier');
+  textFont("Courier");
 
   drawTop(percent);
   drawNumbers();
@@ -167,8 +234,24 @@ function draw() {
   if (nope) {
     imageMode(CENTER);
     image(nopeImg, width * 0.5, height * 0.5);
-    if (millis() - nopeTime > 2000) {
+    if (millis() - nopeTime > 1000) {
       nope = false;
+    }
+  }
+
+  if (completed) {
+    imageMode(CENTER);
+    image(completedImg, width * 0.5, height * 0.5);
+    // if (millis() - completedTime > 5000) {
+    //   startOver();
+    // }
+  }
+
+  if (shared) {
+    imageMode(CENTER);
+    image(sharedImg, width * 0.5, height * 0.5);
+    if (millis() - sharedTime > 10000) {
+      startOver();
     }
   }
 
@@ -184,13 +267,14 @@ function draw() {
         let w = width / dim;
         let h = height / dim;
         noStroke();
-        rectMode(CORNER);
         let hu = map(osn.noise3D(xoff, yoff, zoff * 2), -1, 1, -100, 500);
         fill(hu, 255, 255, 0.2);
         stroke(hu, 255, 255);
         strokeWeight(4);
+        imageMode(CORNER);
         image(mdeGIF[0], i * w, j * h, w, h);
         index++;
+        rectMode(CORNER);
         rect(i * w, j * h, w, h);
         xoff += 5;
       }
@@ -226,7 +310,7 @@ function drawTop(percent) {
   stroke(255);
   strokeWeight(4);
   textSize(32);
-  textFont('Arial');
+  textFont("Arial");
   text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
 }
 
@@ -311,7 +395,7 @@ function drawBottom() {
   fill(255);
   rect(0, height - 20, width, 20);
   fill(0);
-  textFont('Courier');
+  textFont("Courier");
   textAlign(CENTER, CENTER);
   textSize(baseSize * 0.8);
   text(coordinates, width * 0.5, height - 10);

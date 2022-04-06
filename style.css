@@ -7,3 +7,7 @@ canvas {
   display: block;
   touch-action: none;
 }
+
+div {
+  cursor: pointer;
+}

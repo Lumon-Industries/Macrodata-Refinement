@@ -11,7 +11,7 @@ class Data {
     this.sz = baseSize;
     this.refined = false;
     this.binIt = false;
-    this.bin = -1;
+    this.bin = undefined;
   }
 
   refine(bin) {
@@ -20,23 +20,26 @@ class Data {
   }
 
   goBin() {
-    let targetX = width / 2;
-    let targetY = height;
-    this.x = lerp(this.x, this.bin.x, random(0, 0.2));
-    this.y = lerp(this.y, this.bin.y, random(0, 0.2));
-    this.x += random(-5, 5);
-    this.y += random(-5, 5);
-    if (dist(this.x, this.y, this.bin.x, this.bin.y) < 2) {
-      this.bin.addNumber();
-      this.num = floor(random(10));
-      this.x = this.homeX;
-      this.y = this.homeY;
-      this.refined = false;
-      this.binIt = false;
-      this.bin = -1;
-      this.r = 255;
-      this.g = 255;
-      this.b = 255;
+    // This is a band-aid
+    if (this.bin) {
+      let targetX = width / 2;
+      let targetY = height;
+      if (this.bin) this.x = lerp(this.x, this.bin.x, random(0, 0.2));
+      this.y = lerp(this.y, this.bin.y, random(0, 0.2));
+      this.x += random(-5, 5);
+      this.y += random(-5, 5);
+      if (dist(this.x, this.y, this.bin.x, this.bin.y) < 2) {
+        this.bin.addNumber();
+        this.num = floor(random(10));
+        this.x = this.homeX;
+        this.y = this.homeY;
+        this.refined = false;
+        this.binIt = false;
+        this.bin = undefined;
+        this.r = 255;
+        this.g = 255;
+        this.b = 255;
+      }
     }
   }
 
@@ -66,7 +69,7 @@ class Data {
   }
 
   show() {
-    textFont('Courier');
+    textFont("Courier");
     textSize(this.sz);
     textAlign(CENTER, CENTER);
     fill(this.r, this.g, this.b);
