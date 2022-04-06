@@ -17,3 +17,10 @@ Over tie, certain clusters of numbers will start to make you feel a certain way.
 There are four categories of umbers, each of which elicits a different feeling. A refiner's job is to fill each of the five bins evely with the four kinds of number clusters.
 
 Once every bin is properly filled, the file is 100% refined and the job is done.
+
+```
+WO: These numbers elicit melancholy or despair.
+FC: These numbers elicit joy, gaiety or ecstasy.
+DR: These numbers elicit fear, anxiety or apprehension.
+MA: These numbers elicit rage or a desire to do harm.
+```
