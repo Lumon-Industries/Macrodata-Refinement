@@ -54,11 +54,11 @@ function generateCoordinates() {
 }
 
 function preload() {
-  lumon = loadImage('lumon.png');
-  nopeImg = loadImage('nope.png');
-  completedImg = loadImage('100.png');
-  sharedImg = loadImage('clipboard.png');
-  mdeGIF[0] = loadImage('mde.gif');
+  lumon = loadImage('images/lumon.png');
+  nopeImg = loadImage('images/nope.png');
+  completedImg = loadImage('images/100.png');
+  sharedImg = loadImage('images/clipboard.png');
+  mdeGIF[0] = loadImage('images/mde.gif');
 }
 
 function startOver() {
