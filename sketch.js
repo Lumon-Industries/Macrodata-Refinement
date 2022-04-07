@@ -54,11 +54,11 @@ function generateCoordinates() {
 }
 
 function preload() {
-  lumon = loadImage('lumon.png');
-  nopeImg = loadImage('nope.png');
-  completedImg = loadImage('100.png');
-  sharedImg = loadImage('clipboard.png');
-  mdeGIF[0] = loadImage('mde.gif');
+  lumon = loadImage('images/lumon.png');
+  nopeImg = loadImage('images/nope.png');
+  completedImg = loadImage('images/100.png');
+  sharedImg = loadImage('images/clipboard.png');
+  mdeGIF[0] = loadImage('images/mde.gif');
 }
 
 function startOver() {
@@ -220,7 +220,7 @@ function draw() {
     sharedTime = millis();
   }
 
-  background("#164c68");
+  background("#03354d");
   textFont('Helvetica');
 
   drawTop(percent);
@@ -306,7 +306,7 @@ function drawTop(percent) {
   rect(wx + realW - pw, 25, pw, 50);
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
   noFill();
-  fill("#164c68");
+  fill("#03354d");
   stroke("#98faff");
   strokeWeight(4);
   textSize(32);
@@ -392,7 +392,7 @@ function drawBottom() {
   }
 
   rectMode(CORNER);
-  fill("#164c68");
+  fill("#03354d");
   rect(0, height - 20, width, 20);
   fill("#98faff");
   textFont('Helvetica');

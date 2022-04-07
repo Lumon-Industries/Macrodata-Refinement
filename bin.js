@@ -65,7 +65,7 @@ class Bin {
     textAlign(LEFT, CENTER);
     stroke("#98faff");
     strokeWeight(2);
-    fill("#174b68");
+    fill("#03354d");
     text(
       `${floor(nf(100 * perc, 2, 0))}%`,
       this.x - rw * 0.45,
@@ -77,14 +77,14 @@ class Bin {
       let levelH = buffer * 1.7;
       let levelY = this.y - buffer;
       stroke("#98faff");
-      fill("#174b68");
+      fill("#03354d");
       rect(this.x, levelY, rw, levelH);
 
       push();
       translate(this.x + rw * 0.5, height - buffer);
       rectMode(CORNER);
       stroke("#98faff");
-      fill("#174b68");
+      fill("#03354d");
       rotate(-PI / 4);
       rect(0, 0, width * 0.05, 10);
       pop();
@@ -92,7 +92,7 @@ class Bin {
       translate(this.x - rw * 0.5 - 8, height - buffer + 8);
       rectMode(CORNER);
       stroke("#98faff");
-      fill("#174b68");
+      fill("#03354d");
       rotate(PI + PI / 4);
       rect(0, 0, width * 0.05, 10);
       pop();
