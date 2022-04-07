@@ -127,7 +127,7 @@ function setup() {
       thenumbers += '\n';
     }
     const msg = `In refining ${coordinates} I have brought glory to the company. Praise Kier.
-${thenumbers} #mdrlumon #severance 🧇🐐🔢💯
+${thenumbers}#mdrlumon #severance 🧇🐐🔢💯
 lumon-industries.com`;
 
     // if (navigator.share) {
