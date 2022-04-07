@@ -66,7 +66,6 @@ function preload() {
 function startOver() {
   generateCoordinates();
   // Create the space
-  let smaller = min(width, height);
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
@@ -100,12 +99,15 @@ function startOver() {
 }
 let zoff = 0;
 
+let smaller;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  smaller = min(width, height);
 
-  sharedImg.resize(width * 0.5, 0);
-  nopeImg.resize(width * 0.5, 0);
-  completedImg.resize(width * 0.5, 0);
+  sharedImg.resize(smaller * 0.5, 0);
+  nopeImg.resize(smaller * 0.5, 0);
+  completedImg.resize(smaller * 0.5, 0);
 
   // Width for the share 100% button
   const shw = completedImg.width;
