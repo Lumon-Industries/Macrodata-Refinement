@@ -1,7 +1,7 @@
 let osn;
 
 // Total numbers to be collected
-let goal = 500;
+let goal = 10;
 
 // Tracking the numbers
 let refined = [];
@@ -15,6 +15,8 @@ let refining = false;
 let refineTX, refinteTY, refineBX, refineBY;
 
 let lumon;
+
+const emojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
 
 // Info for "nope" state
 let nope = false;
@@ -115,9 +117,17 @@ function setup() {
   shareDiv.style('width', `${shw}px`);
   shareDiv.style('height', `${shh}px`);
   shareDiv.mousePressed(function () {
+    let thenumbers = '';
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 5; c++) {
+        thenumbers += random(emojis);
+      }
+      thenumbers += '\n';
+    }
     const msg = `In refining ${coordinates} I have brought glory to the company. Praise Kier.
-💯🔢🐐🧇 #Severance 🧇🐐🔢💯
-lumon-industries.com #WaffleParty`;
+${thenumbers} #mdrlumon #severance 🧇🐐🔢💯
+lumon-industries.com`;
+
     // if (navigator.share) {
     //   console.log("using navigator share");
     // } else {
