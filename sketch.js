@@ -1,7 +1,7 @@
 let osn;
 
 // Total numbers to be collected
-let goal = 10;
+let goal = 500;
 
 // Tracking the numbers
 let refined = [];
