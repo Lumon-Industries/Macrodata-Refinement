@@ -64,6 +64,8 @@ function preload() {
   completedImg = loadImage('images/100.png');
   sharedImg = loadImage('images/clipboard.png');
   mdeGIF[0] = loadImage('images/mde.gif');
+
+  crtShader = loadShader('shaders/crt.vert.glsl', 'shaders/crt.frag.glsl')
 }
 
 function startOver() {
