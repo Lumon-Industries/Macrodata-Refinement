@@ -44,6 +44,9 @@ let coordinates = `0x6AF307:0x38A6B7`;
 
 let shareDiv;
 
+// for CRT Shader
+let canvas, shaderLayer, crtShader, ctx;
+
 // Function to pick coordinates
 function randHex() {
   return floor(random(0, 256)).toString(16).toUpperCase();
@@ -102,7 +105,14 @@ let zoff = 0;
 let smaller;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  // Get the canvas context so we can grab the image data from it later
+  canvas = createCanvas(windowWidth, windowHeight).canvas;
+  ctx = canvas.getContext('2d');
+
+  // p5 graphics element to draw our shader output to
+  shaderLayer = createGraphics(windowWidth, windowHeight, WEBGL);
+  shaderLayer.noStroke();  
+  
   smaller = min(width, height);
 
   sharedImg.resize(smaller * 0.5, 0);
@@ -300,6 +310,17 @@ function draw() {
   // rotate(frameCount * 0.05);
   // image(mdeGIF, 0, 0);
   // pop();
+
+  shaderLayer.rect(0, 0, width, height);
+  shaderLayer.shader(crtShader);
+  
+  // pass the image from canvas context in to shader as uniform
+  crtShader.setUniform('u_tex', ctx.getImageData(0, 0, width, height));
+  crtShader.setUniform('u_resolution', [width, height]);
+  
+  // Resetting the backgroudn to black to check we're not seeing the original drawing output 
+  background(255);
+  image(shaderLayer, 0, 0, width, height);
 }
 
 function drawTop(percent) {
