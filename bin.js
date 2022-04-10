@@ -45,23 +45,48 @@ class Bin {
     let perc = this.count / this.goal;
     rectMode(CENTER);
     let rw = this.w - this.w * 0.25;
+
+    this.drawBottomOutlines(rw, buffer);
+    
+    this.drawProgressBar(rw, buffer, perc);
+    this.writeIndex();
+    this.writePercentage(perc, rw, buffer);
+
+    if (this.showLevels) {
+      this.drawLevels(rw, buffer);
+    }
+    pop();
+  }
+
+  drawBottomOutlines(rw, buffer){
     stroke(255);
     strokeWeight(1);
     noFill();
+
     rectMode(CENTER);
     rect(this.x, this.y, rw, buffer * 0.25);
     rect(this.x, this.y + buffer * 0.3, rw, buffer * 0.25);
-    fill(255);
+  }
+
+  drawProgressBar(rw, buffer, perc){
+    fill("255");
     noStroke();
     rectMode(CORNER);
+    
     let h = buffer * 0.25;
     rect(this.x - rw * 0.5, this.y + buffer * 0.3 - h * 0.5, rw * perc, h);
+  }
+
+  writeIndex(){
     textSize(16);
     textFont('Arial');
     textAlign(CENTER, CENTER);
     fill(255);
     noStroke();
     text(nf(this.i, 2, 0), this.x, this.y);
+  }
+
+  writePercentage(perc, rw, buffer){
     textAlign(LEFT, CENTER);
     stroke(255);
     strokeWeight(2);
@@ -71,64 +96,80 @@ class Bin {
       this.x - rw * 0.45,
       this.y + buffer * 0.3
     );
+  }
 
-    if (this.showLevels) {
-      rectMode(CENTER);
-      let levelH = buffer * 1.7;
-      let levelY = this.y - buffer;
-      stroke(255);
-      fill(0);
-      rect(this.x, levelY, rw, levelH);
+  drawLevels(rw, buffer){
+    rectMode(CENTER);
+    let levelH = buffer * 1.7;
+    let levelY = this.y - buffer;
 
-      push();
-      translate(this.x + rw * 0.5, height - buffer);
-      rectMode(CORNER);
-      stroke(255);
-      fill(0);
-      rotate(-PI / 4);
-      rect(0, 0, width * 0.05, 10);
-      pop();
-      push();
-      translate(this.x - rw * 0.5 - 8, height - buffer + 8);
-      rectMode(CORNER);
-      stroke(255);
-      fill(0);
-      rotate(PI + PI / 4);
-      rect(0, 0, width * 0.05, 10);
-      pop();
+    // Draw main outline
+    stroke(255);
+    fill(0);
+    rect(this.x, levelY, rw, levelH);
 
-      for (let i = 1; i < 5; i++) {
-        rectMode(CORNER);
-        stroke(255);
-        noFill();
-        rect(
-          this.x - rw * 0.25,
-          levelY - buffer + i * buffer * 0.35,
-          rw * 0.7,
-          buffer * 0.15
-        );
+    this.drawBinLids(rw, buffer);
 
-        fill(255);
-        let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
-        rect(
-          this.x - rw * 0.25,
-          levelY - buffer + i * buffer * 0.35,
-          w,
-          buffer * 0.15
-        );
-
-        textAlign(LEFT, CENTER);
-        noStroke();
-        fill(255);
-        text(
-          keys[i - 1],
-          this.x - rw * 0.45,
-          levelY - buffer + i * buffer * 0.35 + buffer * 0.075
-        );
-      }
-
-      if (millis() - this.showTime > 1000) this.showLevels = false;
+    for (let i = 1; i < 5; i++) {
+      this.drawLevel(i, levelY, rw, buffer);
     }
+
+    if (millis() - this.showTime > 1000) this.showLevels = false;
+  }
+
+  drawLevel(i, levelY, rw, buffer){
+    rectMode(CORNER);
+    stroke("255");
+    noFill();
+
+    // Draw the outline of the progress bar
+    rect(
+      this.x - rw * 0.25,
+      levelY - buffer + i * buffer * 0.35,
+      rw * 0.7,
+      buffer * 0.15
+    );
+
+    // Draw the filled bar inside of the progress bar.
+    fill(255);
+    let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
+    rect(
+      this.x - rw * 0.25,
+      levelY - buffer + i * buffer * 0.35,
+      w,
+      buffer * 0.15
+    );
+
+    // Draw the label for the progress bar.
+    textAlign(LEFT, CENTER);
+    noStroke();
+    fill(255);
+    text(
+      keys[i - 1],
+      this.x - rw * 0.45,
+      levelY - buffer + i * buffer * 0.35 + buffer * 0.075
+    );
+  }
+
+  drawBinLids(rw, buffer){
+    // Draw right bin lid
+    push();
+    translate(this.x + rw * 0.5, height - buffer);
+    rectMode(CORNER);
+    stroke(255);
+    fill(0);
+    rotate(-PI / 4);
+    rect(0, 0, width * 0.05, 10);
+    pop();
+
+    // Draw left bin lid
+    push();
+    translate(this.x - rw * 0.5 - 8, height - buffer + 8);
+    rectMode(CORNER);
+    stroke(255);
+    fill(0);
+    rotate(PI + PI / 4);
+    rect(0, 0, width * 0.05, 10);
     pop();
   }
 }
