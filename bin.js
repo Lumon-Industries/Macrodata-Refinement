@@ -13,7 +13,7 @@ class Bin {
     this.y = height - buffer * 0.75;
     this.count = 0;
     this.goal = goal;
-    
+
     this.levelGoal = this.goal / 4;
 
     this.levelsYOffset = levelH;
@@ -46,8 +46,9 @@ class Bin {
     this.showTime = millis();
   }
 
-  open(){
-    if(!this.showLevels){ // Only start the animation if the bin is closed
+  open() {
+    if (!this.showLevels) {
+      // Only start the animation if the bin is closed
       this.lidAngle = closedLidAngle;
       this.animationStartTime = millis();
       this.openingAnimation = true;
@@ -70,7 +71,7 @@ class Bin {
     }
 
     this.drawBottomOutlines(rw, buffer);
-    
+
     this.drawProgressBar(rw, buffer, perc);
     this.writeIndex();
     this.writePercentage(perc, rw, buffer);
@@ -78,7 +79,7 @@ class Bin {
     pop();
   }
 
-  drawBottomOutlines(rw, buffer){
+  drawBottomOutlines(rw, buffer) {
     stroke(255);
     strokeWeight(1);
     fill(0);
@@ -88,16 +89,16 @@ class Bin {
     rect(this.x, this.y + buffer * 0.3, rw, buffer * 0.25);
   }
 
-  drawProgressBar(rw, buffer, perc){
+  drawProgressBar(rw, buffer, perc) {
     fill(255);
     noStroke();
     rectMode(CORNER);
-    
+
     let h = buffer * 0.25;
     rect(this.x - rw * 0.5, this.y + buffer * 0.3 - h * 0.5, rw * perc, h);
   }
 
-  writeIndex(){
+  writeIndex() {
     textSize(16);
     textFont('Arial');
     textAlign(CENTER, CENTER);
@@ -106,7 +107,7 @@ class Bin {
     text(nf(this.i, 2, 0), this.x, this.y);
   }
 
-  writePercentage(perc, rw, buffer){
+  writePercentage(perc, rw, buffer) {
     textAlign(LEFT, CENTER);
     stroke(255);
     strokeWeight(2);
@@ -118,7 +119,7 @@ class Bin {
     );
   }
 
-  drawLevels(rw, buffer){
+  drawLevels(rw, buffer) {
     rectMode(CENTER);
     let levelY = this.y - buffer;
 
@@ -134,9 +135,9 @@ class Bin {
     }
 
     if (millis() - this.showTime > maxShowTime) {
-      if(!this.openingAnimation){
+      if (!this.openingAnimation) {
         this.lidAngle = maxLidAngle;
-        if(!this.closingAnimation){
+        if (!this.closingAnimation) {
           this.animationStartTime = millis();
         }
         this.closingAnimation = true;
@@ -144,21 +145,44 @@ class Bin {
       }
     }
 
-    if(this.openingAnimation){
-      this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, closedLidAngle, maxLidAngle);
-      this.levelsYOffset = map(millis() - this.animationStartTime, 0, maxShowTime, levelH, 0);
+    if (this.openingAnimation) {
+      this.lidAngle = map(
+        millis() - this.animationStartTime,
+        0,
+        maxShowTime,
+        closedLidAngle,
+        maxLidAngle
+      );
+      this.levelsYOffset = map(
+        millis() - this.animationStartTime,
+        0,
+        maxShowTime,
+        levelH,
+        0
+      );
 
-      if(this.lidAngle <= maxLidAngle){
+      if (this.lidAngle <= maxLidAngle) {
         this.lidAngle = maxLidAngle;
         this.openingAnimation = false;
         this.showTime = millis();
       }
+    } else if (this.closingAnimation) {
+      this.lidAngle = map(
+        millis() - this.animationStartTime,
+        0,
+        maxShowTime,
+        maxLidAngle,
+        closedLidAngle
+      );
+      this.levelsYOffset = map(
+        millis() - this.animationStartTime,
+        0,
+        maxShowTime,
+        0,
+        levelH
+      );
 
-    }else if(this.closingAnimation){
-      this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, maxLidAngle, closedLidAngle);
-      this.levelsYOffset = map(millis() - this.animationStartTime, 0, maxShowTime, 0, levelH);
-
-      if(this.lidAngle >= closedLidAngle){
+      if (this.lidAngle >= closedLidAngle) {
         this.lidAngle = maxLidAngle;
         this.closingAnimation = false;
         this.showLevels = false;
@@ -166,9 +190,9 @@ class Bin {
     }
   }
 
-  drawLevel(i, y, rw, buffer){
+  drawLevel(i, y, rw, buffer) {
     rectMode(CORNER);
-    stroke("255");
+    stroke('255');
     noFill();
 
     // Draw the outline of the progress bar
@@ -182,12 +206,7 @@ class Bin {
     // Draw the filled bar inside of the progress bar.
     fill(255);
     let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
-    rect(
-      this.x - rw * 0.25,
-      y - buffer + i * buffer * 0.35,
-      w,
-      buffer * 0.15
-    );
+    rect(this.x - rw * 0.25, y - buffer + i * buffer * 0.35, w, buffer * 0.15);
 
     // Draw the label for the progress bar.
     textAlign(LEFT, CENTER);
@@ -201,7 +220,7 @@ class Bin {
     );
   }
 
-  drawBinLids(rw, buffer){
+  drawBinLids(rw, buffer) {
     let angle = radians(-this.lidAngle);
 
     stroke(255);
@@ -213,10 +232,10 @@ class Bin {
     angle = radians(180 + this.lidAngle);
 
     // Draw left bin lid
-    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle, rw)
+    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle, rw);
   }
 
-  drawHalfBinLid(x, y, angle, rw){
+  drawHalfBinLid(x, y, angle, rw) {
     const lidThickness = 15;
     // const doorWidth = width * 0.05;
     const doorWidth = rw * 0.5;
@@ -229,9 +248,8 @@ class Bin {
 
     // In the show we see that the lids do not have 90 degree angles, which means that we cannot use the rect() function.
 
-
     push();
-    beginShape()
+    beginShape();
     translate(x, y);
     vertex(0, 0);
     vertex(doorXLength, doorYLength);
@@ -240,6 +258,5 @@ class Bin {
     vertex(0, lidThickness);
     endShape(CLOSE);
     pop();
-
   }
 }
