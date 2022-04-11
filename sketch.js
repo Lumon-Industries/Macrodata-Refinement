@@ -321,7 +321,8 @@ function draw() {
   crtShader.setUniform('u_resolution', [width, height]);
   
   // Resetting the backgroudn to black to check we're not seeing the original drawing output 
-  background(255);
+  background(0);
+  imageMode(CORNER);
   image(shaderLayer, 0, 0, width, height);
 }
 
