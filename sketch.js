@@ -45,7 +45,8 @@ let coordinates = `0x6AF307:0x38A6B7`;
 let shareDiv;
 
 // for CRT Shader
-let canvas, shaderLayer, crtShader, ctx;
+let shaderLayer, crtShader;
+let g; //p5 graphics instance
 
 // Function to pick coordinates
 function randHex() {
@@ -107,18 +108,18 @@ let zoff = 0;
 let smaller;
 
 function setup() {
-  // Get the canvas context so we can grab the image data from it later
-  canvas = createCanvas(windowWidth, windowHeight).canvas;
-  ctx = canvas.getContext('2d');
-
+  createCanvas(windowWidth, windowHeight);
+  
+  // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
+  g = createGraphics(windowWidth, windowHeight);
+  
   // force pixel density to 1 to improve perf on retina screens
   pixelDensity(1);
-  // reduce screen res to improve performance
-  scale(0.5);
-
+  
   // p5 graphics element to draw our shader output to
-  shaderLayer = createGraphics(windowWidth, windowHeight, WEBGL);
+  shaderLayer = createGraphics(g.width, g.height, WEBGL);
   shaderLayer.noStroke();  
+  crtShader.setUniform('u_resolution', [g.width, g.height]);
   
   smaller = min(width, height);
 
@@ -221,7 +222,7 @@ function mouseReleased() {
 }
 
 function draw() {
-  colorMode(RGB);
+  g.colorMode(RGB);
   let sum = 0;
   for (let bin of refined) {
     sum += bin.count;
@@ -250,8 +251,8 @@ function draw() {
     sharedTime = millis();
   }
 
-  background(0);
-  textFont('Courier');
+  g.background(2);
+  g.textFont('Courier');
 
   drawTop(percent);
   drawNumbers();
@@ -259,8 +260,8 @@ function draw() {
 
   drawBinned();
 
-  imageMode(CORNER);
-  image(lumon, width - lumon.width, 0);
+  g.imageMode(CORNER);
+  g.image(lumon, g.width - lumon.width, 0);
   if (nope) {
     imageMode(CENTER);
     image(nopeImg, width * 0.5, height * 0.5);
@@ -270,23 +271,23 @@ function draw() {
   }
 
   if (completed) {
-    imageMode(CENTER);
-    image(completedImg, width * 0.5, height * 0.5);
+    g.imageMode(CENTER);
+    g.image(completedImg, g.width * 0.5, g.height * 0.5);
     // if (millis() - completedTime > 5000) {
     //   startOver();
     // }
   }
 
   if (shared) {
-    imageMode(CENTER);
-    image(sharedImg, width * 0.5, height * 0.5);
+    g.imageMode(CENTER);
+    g.image(sharedImg, g.width * 0.5, g.height * 0.5);
     if (millis() - sharedTime > 10000) {
       startOver();
     }
   }
 
   if (mde) {
-    colorMode(HSB);
+    g.colorMode(HSB);
     let dim = 5;
     let yoff = 100;
     let inc = 0;
@@ -296,16 +297,16 @@ function draw() {
       for (let j = 0; j < dim; j++) {
         let w = width / dim;
         let h = height / dim;
-        noStroke();
+        g.noStroke();
         let hu = map(osn.noise3D(xoff, yoff, zoff * 2), -1, 1, -100, 500);
-        fill(hu, 255, 255, 0.2);
-        stroke(hu, 255, 255);
-        strokeWeight(4);
-        imageMode(CORNER);
-        image(mdeGIF[0], i * w, j * h, w, h);
+        g.fill(hu, 255, 255, 0.2);
+        g.stroke(hu, 255, 255);
+        g.strokeWeight(4);
+        g.imageMode(CORNER);
+        g.image(mdeGIF[0], i * w, j * h, w, h);
         index++;
-        rectMode(CORNER);
-        rect(i * w, j * h, w, h);
+        g.rectMode(CORNER);
+        g.rect(i * w, j * h, w, h);
         xoff += 5;
       }
       yoff += 5;
@@ -322,8 +323,7 @@ function draw() {
   shaderLayer.shader(crtShader);
   
   // pass the image from canvas context in to shader as uniform
-  crtShader.setUniform('u_tex', ctx.getImageData(0, 0, width, height));
-  crtShader.setUniform('u_resolution', [width, height]);
+  crtShader.setUniform('u_tex', g);
   
   // Resetting the backgroudn to black to check we're not seeing the original drawing output 
   background(0);
@@ -334,36 +334,36 @@ function draw() {
 }
 
 function drawTop(percent) {
-  rectMode(CORNER);
-  stroke(255);
-  let w = width * 0.9;
-  strokeWeight(2);
-  let wx = (width - w) * 0.5;
-  noFill();
-  rect(wx, 25, w, 50);
-  noStroke();
-  fill(255);
+  g.rectMode(CORNER);
+  g.stroke(255);
+  let w = g.width * 0.9;
+  g.strokeWeight(2);
+  let wx = (g.width - w) * 0.5;
+  g.noFill();
+  g.rect(wx, 25, w, 50);
+  g.noStroke();
+  g.fill(255);
 
   let realW = w - lumon.width * 0.4;
   let pw = realW * percent;
 
   rect(wx + realW - pw, 25, pw, 50);
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
-  noFill();
-  fill(0);
-  stroke(255);
-  strokeWeight(4);
-  textSize(32);
-  textFont('Arial');
-  text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
+  g.noFill();
+  g.fill(0);
+  g.stroke(255);
+  g.strokeWeight(4);
+  g.textSize(32);
+  g.textFont('Arial');
+  g.text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
 }
 
 function drawNumbers() {
-  rectMode(CENTER);
-  noFill();
-  strokeWeight(1);
-  line(0, buffer, width, buffer);
-  line(0, height - buffer, width, height - buffer);
+  g.rectMode(CENTER);
+  g.noFill();
+  g.strokeWeight(1);
+  g.line(0, buffer, g.width, buffer);
+  g.line(0, height - buffer, g.width, g.height - buffer);
   //rect(width * 0.5, height * 0.5, width * 2, 20 + height - buffer * 2);
   //rect(width * 0.5, height * 0.5, width * 2, 30 + height - buffer * 2);
 
@@ -392,7 +392,7 @@ function drawNumbers() {
 
       let sz = n * baseSize * 4 + baseSize;
       let d = dist(mouseX, mouseY, num.x, num.y);
-      if (d < width * 0.1) {
+      if (d < g.width * 0.1) {
         //sz += map(d, 0, width * 0.1, 24, 0);
         num.x += random(-1, 1);
         num.y += random(-1, 1);
@@ -414,11 +414,11 @@ function drawBottom() {
   }
 
   if (refining) {
-    push();
-    rectMode(CORNERS);
-    stroke(255);
-    noFill();
-    rect(refineTX, refineTY, refineBX, refineBY);
+    g.push();
+    g.rectMode(CORNERS);
+    g.stroke(255);
+    g.noFill();
+    g.rect(refineTX, refineTY, refineBX, refineBY);
 
     for (let num of numbers) {
       if (
@@ -432,17 +432,17 @@ function drawBottom() {
         num.refined = false;
       }
     }
-    pop();
+    g.pop();
   }
 
-  rectMode(CORNER);
-  fill(255);
-  rect(0, height - 20, width, 20);
-  fill(0);
-  textFont('Courier');
-  textAlign(CENTER, CENTER);
-  textSize(baseSize * 0.8);
-  text(coordinates, width * 0.5, height - 10);
+  g.rectMode(CORNER);
+  g.fill(255);
+  g.rect(0, g.height - 20, g.width, 20);
+  g.fill(0);
+  g.textFont('Courier');
+  g.textAlign(CENTER, CENTER);
+  g.textSize(baseSize * 0.8);
+  g.text(coordinates, g.width * 0.5, g.height - 10);
 }
 
 function drawBinned() {

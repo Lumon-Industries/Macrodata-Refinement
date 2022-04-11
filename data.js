@@ -69,11 +69,11 @@ class Data {
   }
 
   show() {
-    textFont("Courier");
-    textSize(this.sz);
-    textAlign(CENTER, CENTER);
-    fill(this.r, this.g, this.b);
-    text(this.num, this.x, this.y);
+    g.textFont("Courier");
+    g.textSize(this.sz);
+    g.textAlign(CENTER, CENTER);
+    g.fill(this.r, this.g, this.b);
+    g.text(this.num, this.x, this.y);
 
     // rectMode(CENTER);
     // noFill();
