@@ -111,6 +111,8 @@ function setup() {
   canvas = createCanvas(windowWidth, windowHeight).canvas;
   ctx = canvas.getContext('2d');
 
+  // force pixel density to 1 to improve perf on retina screens
+  pixelDensity(1);
   // p5 graphics element to draw our shader output to
   shaderLayer = createGraphics(windowWidth, windowHeight, WEBGL);
   shaderLayer.noStroke();  
@@ -317,8 +319,7 @@ function draw() {
   shaderLayer.shader(crtShader);
   
   // pass the image from canvas context in to shader as uniform
-  const pd = pixelDensity(); //resolution fix for retina displays
-  crtShader.setUniform('u_tex', ctx.getImageData(0, 0, width*pd, height*pd));
+  crtShader.setUniform('u_tex', ctx.getImageData(0, 0, width, height));
   crtShader.setUniform('u_resolution', [width, height]);
   
   // Resetting the backgroudn to black to check we're not seeing the original drawing output 
