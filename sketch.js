@@ -317,7 +317,8 @@ function draw() {
   shaderLayer.shader(crtShader);
   
   // pass the image from canvas context in to shader as uniform
-  crtShader.setUniform('u_tex', ctx.getImageData(0, 0, width, height));
+  const pd = pixelDensity(); //resolution fix for retina displays
+  crtShader.setUniform('u_tex', ctx.getImageData(0, 0, width*pd, height*pd));
   crtShader.setUniform('u_resolution', [width, height]);
   
   // Resetting the backgroudn to black to check we're not seeing the original drawing output 
