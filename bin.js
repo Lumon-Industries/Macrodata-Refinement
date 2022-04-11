@@ -1,4 +1,6 @@
 const keys = ['WO', 'FC', 'DR', 'MA'];
+const maxLidAngle = 45;
+const maxShowTime = 1000;
 
 class Bin {
   constructor(w, i, goal) {
@@ -19,6 +21,7 @@ class Bin {
     };
 
     this.showLevels = false;
+    this.openingAnimation = false;
     this.showTime = 0;
   }
 
@@ -33,6 +36,10 @@ class Bin {
     this.levels[key]++;
 
     this.showLevels = true;
+    if(!this.openingAnimation){
+      this.lidAngle = maxLidAngle; // Degrees. Gets converted into radians when it is drawn.
+      this.openingAnimation = true;
+    }
     this.showTime = millis();
   }
 
@@ -114,7 +121,13 @@ class Bin {
       this.drawLevel(i, levelY, rw, buffer);
     }
 
-    if (millis() - this.showTime > 1000) this.showLevels = false;
+    if (millis() - this.showTime > maxShowTime) {
+      this.showLevels = false;
+      this.lidAngle = 180;
+    }else{
+      this.lidAngle = map(millis() - this.showTime, 0, maxShowTime, 0, 180);
+      console.log(this.lidAngle);
+    }
   }
 
   drawLevel(i, levelY, rw, buffer){
@@ -152,24 +165,43 @@ class Bin {
   }
 
   drawBinLids(rw, buffer){
-    // Draw right bin lid
-    push();
-    translate(this.x + rw * 0.5, height - buffer);
-    rectMode(CORNER);
+    let angle = radians(-this.lidAngle);
+
     stroke(255);
     fill(0);
-    rotate(-PI / 4);
-    rect(0, 0, width * 0.05, 10);
-    pop();
+
+    // Draw the top part of the lid.
+    this.drawHalfBinLid(this.x + rw * 0.5, height - buffer, angle);
+
+    angle = radians(180 + this.lidAngle);
 
     // Draw left bin lid
+    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle)
+  }
+
+  drawHalfBinLid(x, y, angle){
+    const lidThickness = 15;
+    const doorWidth = width * 0.05;
+
+    // cos(angle) = a/h, a = h * cos(angle)
+    const doorXLength = doorWidth * cos(angle);
+
+    // sin(angle) = o/h, o = h * sin(angle)
+    const doorYLength = doorWidth * sin(angle);
+
+    // In the show we see that the lids do not have 90 degree angles, which means that we cannot use the rect() function.
+
+
     push();
-    translate(this.x - rw * 0.5 - 8, height - buffer + 8);
-    rectMode(CORNER);
-    stroke(255);
-    fill(0);
-    rotate(PI + PI / 4);
-    rect(0, 0, width * 0.05, 10);
+    beginShape()
+    translate(x, y);
+    vertex(0, 0);
+    vertex(doorXLength, doorYLength);
+    // Move down
+    vertex(doorXLength, doorYLength + lidThickness);
+    vertex(0, lidThickness);
+    endShape(CLOSE);
     pop();
+
   }
 }
