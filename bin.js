@@ -135,7 +135,7 @@ class Bin {
     }
 
     if(this.closingAnimation){
-      this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, 0, closedLidAngle);
+      this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, maxLidAngle, closedLidAngle);
 
       if(this.lidAngle >= closedLidAngle){
         this.lidAngle = maxLidAngle;
