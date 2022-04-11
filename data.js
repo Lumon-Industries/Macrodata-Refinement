@@ -22,6 +22,8 @@ class Data {
   goBin() {
     // This is a band-aid
     if (this.bin) {
+      this.bin.open();
+
       let targetX = width / 2;
       let targetY = height;
       if (this.bin) this.x = lerp(this.x, this.bin.x, random(0, 0.2));
@@ -69,7 +71,7 @@ class Data {
   }
 
   show() {
-    g.textFont("Courier");
+    g.textFont('Courier');
     g.textSize(this.sz);
     g.textAlign(CENTER, CENTER);
     g.fill(this.r, this.g, this.b);
