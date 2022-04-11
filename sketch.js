@@ -113,6 +113,9 @@ function setup() {
 
   // force pixel density to 1 to improve perf on retina screens
   pixelDensity(1);
+  // reduce screen res to improve performance
+  scale(0.5);
+
   // p5 graphics element to draw our shader output to
   shaderLayer = createGraphics(windowWidth, windowHeight, WEBGL);
   shaderLayer.noStroke();  
