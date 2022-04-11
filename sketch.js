@@ -263,8 +263,8 @@ function draw() {
   g.imageMode(CORNER);
   g.image(lumon, g.width - lumon.width, 0);
   if (nope) {
-    imageMode(CENTER);
-    image(nopeImg, width * 0.5, height * 0.5);
+    g.imageMode(CENTER);
+    g.image(nopeImg, g.width * 0.5, g.height * 0.5);
     if (millis() - nopeTime > 1000) {
       nope = false;
     }
@@ -347,7 +347,7 @@ function drawTop(percent) {
   let realW = w - lumon.width * 0.4;
   let pw = realW * percent;
 
-  rect(wx + realW - pw, 25, pw, 50);
+  g.rect(wx + realW - pw, 25, pw, 50);
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
   g.noFill();
   g.fill(0);
