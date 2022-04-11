@@ -71,7 +71,7 @@ class Data {
   }
 
   show() {
-    textFont("Courier");
+    textFont('Courier');
     textSize(this.sz);
     textAlign(CENTER, CENTER);
     fill(this.r, this.g, this.b);
