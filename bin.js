@@ -24,7 +24,7 @@ class Bin {
     this.showLevels = false;
     this.closingAnimation = false;
     this.openingAnimation = false;
-    this.lidAngle = maxLidAngle;
+    this.lidAngle = closedLidAngle;
     this.showTime = 0;
   }
 
@@ -43,8 +43,12 @@ class Bin {
   }
 
   open(){
-    console.log("Opening bin.");
-    this.openingAnimation = true;
+    if(!this.showLevels){ // Only start the animation if the bin is closed
+      this.lidAngle = closedLidAngle;
+      this.animationStartTime = millis();
+      this.openingAnimation = true;
+      this.showLevels = true;
+    }
   }
 
   show() {
@@ -126,15 +130,26 @@ class Bin {
     }
 
     if (millis() - this.showTime > maxShowTime) {
-      this.lidAngle = maxLidAngle;
-      if(!this.closingAnimation){
-        this.animationStartTime = millis();
+      if(!this.openingAnimation){
+        this.lidAngle = maxLidAngle;
+        if(!this.closingAnimation){
+          this.animationStartTime = millis();
+        }
+        this.closingAnimation = true;
+        this.showLevels = true;
       }
-      this.closingAnimation = true;
-      this.showLevels = true;
     }
 
-    if(this.closingAnimation){
+    if(this.openingAnimation){
+      this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, closedLidAngle, maxLidAngle);
+
+      if(this.lidAngle <= maxLidAngle){
+        this.lidAngle = maxLidAngle;
+        this.openingAnimation = false;
+        this.showTime = millis();
+      }
+
+    }else if(this.closingAnimation){
       this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, maxLidAngle, closedLidAngle);
 
       if(this.lidAngle >= closedLidAngle){
@@ -186,17 +201,18 @@ class Bin {
     fill(0);
 
     // Draw the top part of the lid.
-    this.drawHalfBinLid(this.x + rw * 0.5, height - buffer, angle);
+    this.drawHalfBinLid(this.x + rw * 0.5, height - buffer, angle, rw);
 
     angle = radians(180 + this.lidAngle);
 
     // Draw left bin lid
-    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle)
+    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle, rw)
   }
 
-  drawHalfBinLid(x, y, angle){
+  drawHalfBinLid(x, y, angle, rw){
     const lidThickness = 15;
-    const doorWidth = width * 0.05;
+    // const doorWidth = width * 0.05;
+    const doorWidth = rw * 0.5;
 
     // cos(angle) = a/h, a = h * cos(angle)
     const doorXLength = doorWidth * cos(angle);
