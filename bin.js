@@ -193,6 +193,7 @@ class Bin {
     textAlign(LEFT, CENTER);
     noStroke();
     fill(255);
+    textSize(16);
     text(
       keys[i - 1],
       this.x - rw * 0.45,
