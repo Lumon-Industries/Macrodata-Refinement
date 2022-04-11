@@ -65,22 +65,23 @@ class Bin {
     rectMode(CENTER);
     let rw = this.w - this.w * 0.25;
 
+    if (this.showLevels) {
+      this.drawLevels(rw, buffer);
+    }
+
     this.drawBottomOutlines(rw, buffer);
     
     this.drawProgressBar(rw, buffer, perc);
     this.writeIndex();
     this.writePercentage(perc, rw, buffer);
 
-    if (this.showLevels) {
-      this.drawLevels(rw, buffer);
-    }
     pop();
   }
 
   drawBottomOutlines(rw, buffer){
     stroke(255);
     strokeWeight(1);
-    noFill();
+    fill(0);
 
     rectMode(CENTER);
     rect(this.x, this.y, rw, buffer * 0.25);
