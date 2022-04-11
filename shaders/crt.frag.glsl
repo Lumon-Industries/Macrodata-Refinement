@@ -4,7 +4,7 @@
 precision mediump float;
 #endif
 
-float PI = 3.14159;
+#define PI 3.1415926538
 
 // grab texcoords from vert shader
 varying vec2 vTexCoord;
@@ -12,7 +12,7 @@ varying vec2 vTexCoord;
 // our texture coming from p5
 uniform sampler2D u_tex;
 uniform vec2 u_resolution;
-vec2 curvature = vec2(5.0); //zoom level of curvature
+vec2 curvature = vec2(4.5); //zoom level of curvature (lower = curvier)
 
 
 vec2 curveRemapUV(vec2 uv) {
@@ -24,13 +24,6 @@ vec2 curveRemapUV(vec2 uv) {
     return uv;
 }
  
-vec4 scanLineIntensity(float uv, float resolution, float opacity) {
-     float intensity = sin(uv * resolution * PI * 2.0);
-     intensity = ((0.5 * intensity) + 0.5) * 0.9 + 0.1;
-     return vec4(vec3(pow(intensity, opacity)), 1.0);
- }
-
-
 void main() {
   vec2 uv = vTexCoord;
   uv.y = 1.0 - uv.y; //flip the incoming image texture
@@ -38,11 +31,20 @@ void main() {
   vec2 remappedUV = curveRemapUV(vec2(uv.xy));
   vec4 baseColor = texture2D(u_tex, remappedUV);
 
-  baseColor *= scanLineIntensity(remappedUV.x, u_resolution.y*0.25, 1.0);
-  baseColor *= scanLineIntensity(remappedUV.y, u_resolution.x*0.25, 1.0);
+  float line_count = 300.0;
+  float opacity = 0.75;
+  float y_lines = sin(remappedUV.y * line_count * PI * 2.0);
+  y_lines = (y_lines * 0.5 + 0.5) * 0.9 + 0.1;
+  float x_lines = sin(remappedUV.x * line_count * PI * 2.0);
+  x_lines = (x_lines * 0.5 + 0.5) * 0.9 + 0.1;
+  vec4 scan_line = vec4(vec3(pow(y_lines, opacity)), 1.0);
+  vec4 scan_line_x = vec4(vec3(pow(x_lines, opacity)), 1.0);
+
   // boosting the brightness, altering the hue to be more blue
-  baseColor *= vec4(vec3(1.0, 2.0, 8.0), 1.0) * 2.0;
-  
+  baseColor *= vec4(vec3(0.1, 0.2, 2.0), 1.0) * 25.0;  
+
+  baseColor *= scan_line;
+  baseColor *= scan_line_x;
   
   if (remappedUV.x < 0.0 || remappedUV.y < 0.0 || remappedUV.x > 1.0 || remappedUV.y > 1.0) {
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
