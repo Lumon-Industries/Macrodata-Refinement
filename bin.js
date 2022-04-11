@@ -80,6 +80,18 @@ class Bin {
   }
 
   drawBottomOutlines(rw, buffer) {
+    // Extra layer to block tray sliding
+    noStroke();
+    fill(0);
+    rectMode(CORNER);
+    let extra = 4;
+    rect(
+      this.x - rw * 0.5 - extra,
+      this.y - buffer * 0.125,
+      rw + extra * 2,
+      buffer
+    );
+
     stroke(255);
     strokeWeight(1);
     fill(0);
