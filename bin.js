@@ -1,5 +1,6 @@
 const keys = ['WO', 'FC', 'DR', 'MA'];
 const maxLidAngle = 45;
+const closedLidAngle = 180;
 const maxShowTime = 1000;
 
 class Bin {
@@ -21,7 +22,9 @@ class Bin {
     };
 
     this.showLevels = false;
+    this.closingAnimation = false;
     this.openingAnimation = false;
+    this.lidAngle = maxLidAngle;
     this.showTime = 0;
   }
 
@@ -36,11 +39,12 @@ class Bin {
     this.levels[key]++;
 
     this.showLevels = true;
-    if(!this.openingAnimation){
-      this.lidAngle = maxLidAngle; // Degrees. Gets converted into radians when it is drawn.
-      this.openingAnimation = true;
-    }
     this.showTime = millis();
+  }
+
+  open(){
+    console.log("Opening bin.");
+    this.openingAnimation = true;
   }
 
   show() {
@@ -122,11 +126,22 @@ class Bin {
     }
 
     if (millis() - this.showTime > maxShowTime) {
-      this.showLevels = false;
-      this.lidAngle = 180;
-    }else{
-      this.lidAngle = map(millis() - this.showTime, 0, maxShowTime, 0, 180);
-      console.log(this.lidAngle);
+      this.lidAngle = maxLidAngle;
+      if(!this.closingAnimation){
+        this.animationStartTime = millis();
+      }
+      this.closingAnimation = true;
+      this.showLevels = true;
+    }
+
+    if(this.closingAnimation){
+      this.lidAngle = map(millis() - this.animationStartTime, 0, maxShowTime, 0, closedLidAngle);
+
+      if(this.lidAngle >= closedLidAngle){
+        this.lidAngle = maxLidAngle;
+        this.closingAnimation = false;
+        this.showLevels = false;
+      }
     }
   }
 

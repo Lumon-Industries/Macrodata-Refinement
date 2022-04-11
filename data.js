@@ -22,6 +22,8 @@ class Data {
   goBin() {
     // This is a band-aid
     if (this.bin) {
+      this.bin.open();
+
       let targetX = width / 2;
       let targetY = height;
       if (this.bin) this.x = lerp(this.x, this.bin.x, random(0, 0.2));
