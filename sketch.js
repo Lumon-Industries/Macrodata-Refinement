@@ -325,6 +325,8 @@ function draw() {
   background(0);
   imageMode(CORNER);
   image(shaderLayer, 0, 0, width, height);
+
+  drawFPS();
 }
 
 function drawTop(percent) {
@@ -443,4 +445,11 @@ function drawBinned() {
   for (let num of numbers) {
     if (num.binIt) num.show();
   }
+}
+
+function drawFPS() {
+  textSize(24)
+  fill(255)
+  noStroke();
+  text(frameRate().toFixed(2), 50, 25);
 }
