@@ -10,7 +10,7 @@ class Bin {
     this.w = w;
     this.i = i;
     this.x = i * w + w * 0.5;
-    this.y = height - buffer * 0.75;
+    this.y = g.height - buffer * 0.75;
     this.count = 0;
     this.goal = goal;
 
@@ -239,12 +239,12 @@ class Bin {
     g.fill(0);
 
     // Draw the top part of the lid.
-    this.drawHalfBinLid(this.x + rw * 0.5, height - buffer, angle, rw);
+    this.drawHalfBinLid(this.x + rw * 0.5, g.height - buffer, angle, rw);
 
     angle = radians(180 + this.lidAngle);
 
     // Draw left bin lid
-    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle, rw);
+    this.drawHalfBinLid(this.x - rw * 0.5, g.height - buffer, angle, rw);
   }
 
   drawHalfBinLid(x, y, angle, rw) {

@@ -24,8 +24,8 @@ class Data {
     if (this.bin) {
       this.bin.open();
 
-      let targetX = width / 2;
-      let targetY = height;
+      let targetX = g.width / 2;
+      let targetY = g.height;
       if (this.bin) this.x = lerp(this.x, this.bin.x, random(0, 0.2));
       this.y = lerp(this.y, this.bin.y, random(0, 0.2));
       this.x += random(-5, 5);

@@ -75,10 +75,10 @@ function startOver() {
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
-  cols = floor(width / r);
-  rows = floor((height - buffer * 2) / r);
+  cols = floor(g.width / r);
+  rows = floor((g.height - buffer * 2) / r);
 
-  let wBuffer = width - cols * r;
+  let wBuffer = g.width - cols * r;
   for (let j = 0; j < rows; j++) {
     for (let i = 0; i < cols; i++) {
       let x = i * r + r * 0.5 + wBuffer * 0.5;
@@ -90,7 +90,7 @@ function startOver() {
 
   // Refinement bins
   for (let i = 0; i < 5; i++) {
-    const w = width / 5;
+    const w = g.width / 5;
     refined[i] = new Bin(w, i, goal / 5);
   }
 
@@ -121,7 +121,7 @@ function setup() {
   shaderLayer.noStroke();  
   crtShader.setUniform('u_resolution', [g.width, g.height]);
   
-  smaller = min(width, height);
+  smaller = min(g.width, g.height);
 
   sharedImg.resize(smaller * 0.5, 0);
   nopeImg.resize(smaller * 0.5, 0);
@@ -133,7 +133,7 @@ function setup() {
   shareDiv = createDiv('');
   shareDiv.hide();
   //shareDiv.style("background-color", "#AAA");
-  shareDiv.position(width * 0.5 - shw * 0.5, height * 0.5 - shh * 0.5);
+  shareDiv.position(g.width * 0.5 - shw * 0.5, g.height * 0.5 - shh * 0.5);
   shareDiv.style('width', `${shw}px`);
   shareDiv.style('height', `${shh}px`);
   shareDiv.mousePressed(function () {
@@ -295,8 +295,8 @@ function draw() {
     for (let i = 0; i < dim; i++) {
       let xoff = 100;
       for (let j = 0; j < dim; j++) {
-        let w = width / dim;
-        let h = height / dim;
+        let w = g.width / dim;
+        let h = g.height / dim;
         g.noStroke();
         let hu = map(osn.noise3D(xoff, yoff, zoff * 2), -1, 1, -100, 500);
         g.fill(hu, 255, 255, 0.2);
@@ -319,7 +319,7 @@ function draw() {
   // image(mdeGIF, 0, 0);
   // pop();
 
-  shaderLayer.rect(0, 0, width, height);
+  shaderLayer.rect(0, 0, g.width, g.height);
   shaderLayer.shader(crtShader);
   
   // pass the image from canvas context in to shader as uniform
@@ -328,7 +328,7 @@ function draw() {
   // Resetting the backgroudn to black to check we're not seeing the original drawing output 
   background(0);
   imageMode(CORNER);
-  image(shaderLayer, 0, 0, width, height);
+  image(shaderLayer, 0, 0, g.width, g.height);
 
   drawFPS();
 }
@@ -363,7 +363,7 @@ function drawNumbers() {
   g.noFill();
   g.strokeWeight(1);
   g.line(0, buffer, g.width, buffer);
-  g.line(0, height - buffer, g.width, g.height - buffer);
+  g.line(0, g.height - buffer, g.width, g.height - buffer);
   //rect(width * 0.5, height * 0.5, width * 2, 20 + height - buffer * 2);
   //rect(width * 0.5, height * 0.5, width * 2, 30 + height - buffer * 2);
 
