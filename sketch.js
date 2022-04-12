@@ -297,6 +297,8 @@ function draw() {
     let yoff = 100;
     let inc = 0;
     let index = 0;
+    const currGifFrame = frameCount % mdeGIF[0].gifProperties.numFrames
+    mdeGIF[0].setFrame(currGifFrame);
     for (let i = 0; i < dim; i++) {
       let xoff = 100;
       for (let j = 0; j < dim; j++) {
