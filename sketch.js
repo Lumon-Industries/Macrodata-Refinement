@@ -47,7 +47,8 @@ let shareDiv;
 // for CRT Shader
 let shaderLayer, crtShader;
 let g; //p5 graphics instance
-const SCALE_FACTOR = 2;
+let useShader;
+
 
 // Function to pick coordinates
 function randHex() {
@@ -112,7 +113,10 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   
   // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
-  g = createGraphics(windowWidth / SCALE_FACTOR, windowHeight / SCALE_FACTOR);
+  g = createGraphics(windowWidth, windowHeight);
+
+  // We don't want to use shader on mobile
+  useShader = !isTouchScreenDevice();
   
   // force pixel density to 1 to improve perf on retina screens
   pixelDensity(1);
@@ -320,20 +324,21 @@ function draw() {
   // image(mdeGIF, 0, 0);
   // pop();
 
-  g.fill(244);
-  g.ellipse(mouseX * SCALE_FACTOR/2, mouseY * SCALE_FACTOR/2, 10, 10);
-
-  shaderLayer.rect(0, 0, g.width, g.height);
-  shaderLayer.shader(crtShader);
-  
-  
-  // pass the image from canvas context in to shader as uniform
-  crtShader.setUniform('u_tex', g);
-  
-  // Resetting the backgroudn to black to check we're not seeing the original drawing output 
-  background(0);
-  imageMode(CORNER);
-  image(shaderLayer, 0, 0, g.width * SCALE_FACTOR, g.height * SCALE_FACTOR);
+  if (useShader) {
+    
+    shaderLayer.rect(0, 0, g.width, g.height);
+    shaderLayer.shader(crtShader);
+    
+    // pass the image from canvas context in to shader as uniform
+    crtShader.setUniform('u_tex', g);
+    
+    // Resetting the backgroudn to black to check we're not seeing the original drawing output 
+    background(0);
+    imageMode(CORNER);
+    image(shaderLayer, 0, 0, g.width, g.height);
+  } else {
+    image(g, 0, 0, g.width, g.height);
+  }
 
   drawFPS();
 }
