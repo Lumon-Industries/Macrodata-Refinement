@@ -320,8 +320,12 @@ function draw() {
   // image(mdeGIF, 0, 0);
   // pop();
 
+  g.fill(244);
+  g.ellipse(mouseX * SCALE_FACTOR/2, mouseY * SCALE_FACTOR/2, 10, 10);
+
   shaderLayer.rect(0, 0, g.width, g.height);
   shaderLayer.shader(crtShader);
+  
   
   // pass the image from canvas context in to shader as uniform
   crtShader.setUniform('u_tex', g);
@@ -329,7 +333,7 @@ function draw() {
   // Resetting the backgroudn to black to check we're not seeing the original drawing output 
   background(0);
   imageMode(CORNER);
-  image(shaderLayer, 0, 0, g.width, g.height);
+  image(shaderLayer, 0, 0, g.width * SCALE_FACTOR, g.height * SCALE_FACTOR);
 
   drawFPS();
 }
