@@ -47,6 +47,7 @@ let shareDiv;
 // for CRT Shader
 let shaderLayer, crtShader;
 let g; //p5 graphics instance
+const SCALE_FACTOR = 2;
 
 // Function to pick coordinates
 function randHex() {
@@ -111,7 +112,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   
   // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
-  g = createGraphics(windowWidth, windowHeight);
+  g = createGraphics(windowWidth / SCALE_FACTOR, windowHeight / SCALE_FACTOR);
   
   // force pixel density to 1 to improve perf on retina screens
   pixelDensity(1);
