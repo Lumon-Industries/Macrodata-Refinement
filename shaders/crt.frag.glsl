@@ -41,7 +41,13 @@ void main() {
   vec4 scan_line_x = vec4(vec3(pow(x_lines, opacity)), 1.0);
 
   // boosting the brightness, altering the hue to be more blue
-  baseColor *= vec4(vec3(0.1, 0.2, 2.0), 1.0) * 25.0;  
+  float avg = baseColor.r + baseColor.g + baseColor.b / 3.0;
+  if (avg > 0.5) {
+    baseColor *= vec4(vec3(0.2, 1.2, 1.5), 1.0) * 10.0;  
+  } else {
+      baseColor *= vec4(vec3(0.2, 1.2, 1.5), 1.0) * 2.0;  
+  }
+  
 
   baseColor *= scan_line;
   baseColor *= scan_line_x;
