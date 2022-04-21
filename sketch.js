@@ -125,6 +125,7 @@ let smaller;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  frameRate(30);
   
   // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
   g = createGraphics(windowWidth, windowHeight);
@@ -191,6 +192,9 @@ lumon-industries.com`;
   startOver();
 }
 function mousePressed() {
+  if (mouseX/width >= 0.8 && mouseY/height <= 0.1) {
+    toggleShader();
+  }
   // This is the worst if statement in the history of if statements
   if (!refining && !mde && !completed && !shared) {
     refineTX = mouseX;
@@ -316,11 +320,11 @@ function draw() {
     let yoff = 100;
     let inc = 0;
     let index = 0;
-    const currGifFrame = frameCount % mdeGIF[0].gifProperties.numFrames
-    mdeGIF[0].setFrame(currGifFrame);
     for (let i = 0; i < dim; i++) {
       let xoff = 100;
       for (let j = 0; j < dim; j++) {
+        const currGifFrame = (frameCount + ((i+j))) % mdeGIF[0].gifProperties.numFrames;
+        mdeGIF[0].setFrame(currGifFrame);
         let w = g.width / dim;
         let h = g.height / dim;
         g.noStroke();
@@ -487,4 +491,13 @@ function drawFPS() {
   fill(palette.FG);
   noStroke();
   text(frameRate().toFixed(2), 50, 25);
+}
+
+function toggleShader() {
+  if (useShader) {
+    palette = mobilePalette
+  } else {
+    palette = shaderPalette;
+  }
+  useShader = !useShader;
 }
