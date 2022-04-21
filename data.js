@@ -5,9 +5,7 @@ class Data {
     this.homeY = y;
     this.x = x;
     this.y = y;
-    this.r = 255;
-    this.g = 255;
-    this.b = 255;
+    this.color = palette.FG; //TODO: pass this in as arg rather than global variable?
     this.sz = baseSize;
     this.refined = false;
     this.binIt = false;
@@ -38,9 +36,7 @@ class Data {
         this.refined = false;
         this.binIt = false;
         this.bin = undefined;
-        this.r = 255;
-        this.g = 255;
-        this.b = 255;
+        this.color = palette.FG;
       }
     }
   }
@@ -55,10 +51,8 @@ class Data {
     this.sz = sz;
   }
 
-  turn(r, g, b) {
-    this.r = r;
-    this.g = g;
-    this.b = b;
+  turn(newColor) {
+    this.color = newColor;
   }
 
   inside(x1, y1, x2, y2) {
@@ -74,7 +68,7 @@ class Data {
     g.textFont('Courier');
     g.textSize(this.sz);
     g.textAlign(CENTER, CENTER);
-    g.fill(this.r, this.g, this.b);
+    g.fill(this.color);
     g.text(this.num, this.x, this.y);
 
     // rectMode(CENTER);

@@ -220,7 +220,7 @@ function mouseReleased() {
       }
       total++;
     }
-    num.turn(255, 255, 255);
+    num.turn(palette.FG);
     num.refined = false;
   }
   // half of numbers must be refinable
@@ -456,10 +456,10 @@ function drawBottom() {
         num.inside(refineTX, refineTY, refineBX, refineBY) &&
         num.sz > baseSize
       ) {
-        num.turn(255, 0, 0);
+        num.turn(palette.SELECT);
         num.refined = true;
       } else {
-        num.turn(255, 255, 255);
+        num.turn(palette.FG);
         num.refined = false;
       }
     }
