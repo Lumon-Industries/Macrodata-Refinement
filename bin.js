@@ -82,7 +82,7 @@ class Bin {
   drawBottomOutlines(rw, buffer) {
     // Extra layer to block tray sliding
     g.noStroke();
-    g.fill(0);
+    g.fill(palette.BG);
     g.rectMode(CORNER);
     let extra = 4;
     g.rect(
@@ -92,9 +92,9 @@ class Bin {
       buffer
     );
 
-    g.stroke(255);
+    g.stroke(palette.FG);
     g.strokeWeight(1);
-    g.fill(0);
+    g.fill(palette.BG);
 
     g.rectMode(CENTER);
     g.rect(this.x, this.y, rw, buffer * 0.25);
@@ -102,7 +102,7 @@ class Bin {
   }
 
   drawProgressBar(rw, buffer, perc) {
-    g.fill(255);
+    g.fill(palette.FG);
     g.noStroke();
     g.rectMode(CORNER);
 
@@ -114,16 +114,16 @@ class Bin {
     g.textSize(16);
     g.textFont('Arial');
     g.textAlign(CENTER, CENTER);
-    g.fill(255);
+    g.fill(palette.FG);
     g.noStroke();
     g.text(nf(this.i, 2, 0), this.x, this.y);
   }
 
   writePercentage(perc, rw, buffer) {
     g.textAlign(LEFT, CENTER);
-    g.stroke(255);
+    g.stroke(palette.FG);
     g.strokeWeight(2);
-    g.fill(0);
+    g.fill(palette.BG);
     g.text(
       `${floor(nf(100 * perc, 2, 0))}%`,
       this.x - rw * 0.45,
@@ -136,8 +136,8 @@ class Bin {
     let levelY = this.y - buffer;
 
     // Draw main outline
-    g.stroke(255);
-    g.fill(0);
+    g.stroke(palette.FG);
+    g.fill(palette.BG);
     g.rect(this.x, levelY + this.levelsYOffset, rw, levelH);
 
     this.drawBinLids(rw, buffer);
@@ -204,7 +204,7 @@ class Bin {
 
   drawLevel(i, y, rw, buffer) {
     g.rectMode(CORNER);
-    g.stroke('255');
+    g.stroke(palette.FG);
     g.noFill();
 
     // Draw the outline of the progress bar
@@ -216,14 +216,14 @@ class Bin {
     );
 
     // Draw the filled bar inside of the progress bar.
-    g.fill(255);
+    g.fill(palette.FG);
     let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
     g.rect(this.x - rw * 0.25, y - buffer + i * buffer * 0.35, w, buffer * 0.15);
 
     // Draw the label for the progress bar.
     g.textAlign(LEFT, CENTER);
     g.noStroke();
-    g.fill(255);
+    g.fill(palette.FG);
     g.textSize(16);
     g.text(
       keys[i - 1],
@@ -235,8 +235,8 @@ class Bin {
   drawBinLids(rw, buffer) {
     let angle = radians(-this.lidAngle);
 
-    g.stroke(255);
-    g.fill(0);
+    g.stroke(palette.FG);
+    g.fill(palette.BG);
 
     // Draw the top part of the lid.
     this.drawHalfBinLid(this.x + rw * 0.5, g.height - buffer, angle, rw);

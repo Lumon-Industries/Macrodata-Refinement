@@ -49,6 +49,20 @@ let shaderLayer, crtShader;
 let g; //p5 graphics instance
 let useShader;
 
+// Background and Foreground colours
+const mobilePalette = {
+  BG: '#011A32',
+  FG: '#C4FFFF',
+  SELECT: '#FA8585'
+}
+
+const shaderPalette = {
+  BG: '#111111',
+  FG: '#fff',
+  SELECT: '#ff0000',
+};
+
+let palette = mobilePalette;
 
 // Function to pick coordinates
 function randHex() {
@@ -117,6 +131,11 @@ function setup() {
 
   // We don't want to use shader on mobile
   useShader = !isTouchScreenDevice();
+  
+  // The shader boosts colour values so we reset the palette if using shader
+  if (useShader) {
+    palette = shaderPalette;
+  }
   
   // force pixel density to 1 to improve perf on retina screens
   pixelDensity(1);
@@ -256,7 +275,7 @@ function draw() {
     sharedTime = millis();
   }
 
-  g.background(2);
+  g.background(palette.BG);
   g.textFont('Courier');
 
   drawTop(percent);
@@ -335,7 +354,7 @@ function draw() {
     crtShader.setUniform('u_tex', g);
     
     // Resetting the backgroudn to black to check we're not seeing the original drawing output 
-    background(0);
+    background(palette.BG);
     imageMode(CORNER);
     image(shaderLayer, 0, 0, g.width, g.height);
   } else {
@@ -347,14 +366,14 @@ function draw() {
 
 function drawTop(percent) {
   g.rectMode(CORNER);
-  g.stroke(255);
+  g.stroke(palette.FG);
   let w = g.width * 0.9;
   g.strokeWeight(2);
   let wx = (g.width - w) * 0.5;
   g.noFill();
   g.rect(wx, 25, w, 50);
   g.noStroke();
-  g.fill(255);
+  g.fill(palette.FG);
 
   let realW = w - lumon.width * 0.4;
   let pw = realW * percent;
@@ -362,8 +381,8 @@ function drawTop(percent) {
   g.rect(wx + realW - pw, 25, pw, 50);
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
   g.noFill();
-  g.fill(0);
-  g.stroke(255);
+  g.fill(palette.BG);
+  g.stroke(palette.FG);
   g.strokeWeight(4);
   g.textSize(32);
   g.textFont('Arial');
@@ -428,7 +447,7 @@ function drawBottom() {
   if (refining) {
     g.push();
     g.rectMode(CORNERS);
-    g.stroke(255);
+    g.stroke(palette.FG);
     g.noFill();
     g.rect(refineTX, refineTY, refineBX, refineBY);
 
@@ -448,9 +467,9 @@ function drawBottom() {
   }
 
   g.rectMode(CORNER);
-  g.fill(255);
+  g.fill(palette.FG);
   g.rect(0, g.height - 20, g.width, 20);
-  g.fill(0);
+  g.fill(palette.BG);
   g.textFont('Courier');
   g.textAlign(CENTER, CENTER);
   g.textSize(baseSize * 0.8);
@@ -464,8 +483,8 @@ function drawBinned() {
 }
 
 function drawFPS() {
-  textSize(24)
-  fill(255)
+  textSize(24);
+  fill(palette.FG);
   noStroke();
   text(frameRate().toFixed(2), 50, 25);
 }
