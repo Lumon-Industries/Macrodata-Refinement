@@ -44,6 +44,9 @@ let coordinates = `0x6AF307:0x38A6B7`;
 
 let shareDiv;
 
+// file for refining to be assigned or retrieved from local storage
+let macrodataFile;
+
 // Function to pick coordinates
 function randHex() {
   return floor(random(0, 256)).toString(16).toUpperCase();
@@ -85,7 +88,7 @@ function startOver() {
   // Refinement bins
   for (let i = 0; i < 5; i++) {
     const w = width / 5;
-    refined[i] = new Bin(w, i, goal / 5);
+    refined[i] = new Bin(w, i, goal / 5, macrodataFile?.bins[i]);
   }
 
   mde = false;
@@ -104,6 +107,8 @@ let smaller;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   smaller = min(width, height);
+
+  macrodataFile = fetchFile();
 
   sharedImg.resize(smaller * 0.5, 0);
   nopeImg.resize(smaller * 0.5, 0);
@@ -203,6 +208,8 @@ function mouseReleased() {
   }
 }
 
+let prevPercent;
+
 function draw() {
   colorMode(RGB);
   let sum = 0;
@@ -210,6 +217,11 @@ function draw() {
     sum += bin.count;
   }
   let percent = sum / goal;
+
+  if (percent !== prevPercent) {
+    const bins = refined.map(bin => bin.levels);
+    updateFileProgress({...macrodataFile, bins});
+  }
 
   if (percent >= 0.75 && !mde && !mdeDone) {
     mde = true;
@@ -324,7 +336,14 @@ function drawTop(percent) {
   strokeWeight(4);
   textSize(32);
   textFont('Arial');
-  text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
+  text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.80, 50);
+  if (macrodataFile) {
+    fill(255);
+    stroke(0);
+    text(macrodataFile.file, w * 0.175, 50);
+  }
+  fill(0);
+  stroke(255);
 }
 
 function drawNumbers() {
