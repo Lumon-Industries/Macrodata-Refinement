@@ -66,7 +66,7 @@ function preload() {
   mdeGIF[0] = loadImage('images/mde.gif');
 }
 
-function startOver() {
+function startOver(resetFile = false) {
   generateCoordinates();
   // Create the space
   r = (smaller - buffer * 2) / 10;
@@ -85,6 +85,11 @@ function startOver() {
     }
   }
 
+  if (resetFile) {
+    resetFileStorage();
+    macrodataFile = fetchFile();
+  }
+
   // Refinement bins
   for (let i = 0; i < 5; i++) {
     const w = width / 5;
@@ -99,9 +104,10 @@ function startOver() {
   completed = false;
   shared = false;
   shareDiv.hide();
-}
-let zoff = 0;
 
+}
+
+let zoff = 0;
 let smaller;
 
 function setup() {
@@ -276,7 +282,7 @@ function draw() {
     imageMode(CENTER);
     image(sharedImg, width * 0.5, height * 0.5);
     if (millis() - sharedTime > 10000) {
-      startOver();
+      startOver(true);
     }
   }
 

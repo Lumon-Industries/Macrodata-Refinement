@@ -51,7 +51,6 @@ const assignFile = () => {
 }
 
 const updateFileProgress = (macrodataFile) => {
-  console.log('update', macrodataFile)
   localStorage.setItem(macrodataKey, JSON.stringify(macrodataFile));
 }
 
