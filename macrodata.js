@@ -13,8 +13,6 @@ const files = [
   'Dranesville',
 ];
 
-const macrodataKey = 'macrodata';
-
 const emptyBins = [
   {WO: 0, FC: 0, DR: 0, MA: 0},
   {WO: 0, FC: 0, DR: 0, MA: 0},
@@ -23,37 +21,39 @@ const emptyBins = [
   {WO: 0, FC: 0, DR: 0, MA: 0}
  ];
 
-// would it be better to wrap this functionality in a class?
-
-const fetchFile = (filename) => {
-  if (storageAvailable("localStorage")) {
-    const res = localStorage.getItem(macrodataKey);
-    if (res) {
-      console.log('found', res);
-      return JSON.parse(res);
-    } else {
-      return assignFile();
-    }
+class MacrodataFile {
+  constructor() {
+    this.localStorageKey = 'macrodata';
+    const file = JSON.parse(localStorage.getItem(this.localStorageKey)) ?? this.assignFile();
+    this.fileName = file.fileName;
+    this.storedBins = file.storedBins;
   }
-}
 
-const assignFile = () => {
-  if (storageAvailable("localStorage")) {
-    const filename = files[Math.floor(Math.random() * files.length)];
+  assignFile() {
+    // quick fix to ensure you don't get the same filename twice in a row
+    const allFilesButPrevious = files.filter(file => file !== this.fileName);
+    const filename = allFilesButPrevious[Math.floor(Math.random() * allFilesButPrevious.length)];
     console.log('assigning', filename);
     const macrodata = {
-      file: filename,
-      bins: emptyBins
+      fileName: filename,
+      storedBins: emptyBins
     }
-    localStorage.setItem(macrodataKey, JSON.stringify(macrodata));
+    localStorage.setItem(this.localStorageKey, JSON.stringify(macrodata));
     return macrodata;
   }
-}
 
-const updateFileProgress = (macrodataFile) => {
-  localStorage.setItem(macrodataKey, JSON.stringify(macrodataFile));
-}
+  updateProgress(bins) {
+    const updatedFile = {
+      fileName: this.fileName,
+      storedBins: bins
+    }
+    localStorage.setItem(this.localStorageKey, JSON.stringify(updatedFile));
+  }
 
-const resetFileStorage = () => {
-  localStorage.removeItem(macrodataKey);
+  resetFile() {
+    localStorage.removeItem(this.localStorageKey);
+    const file = this.assignFile();
+    this.fileName = file.fileName;
+    this.storedBins = file.storedBins;
+  }
 }

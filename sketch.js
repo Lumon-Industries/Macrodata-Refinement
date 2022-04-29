@@ -86,14 +86,14 @@ function startOver(resetFile = false) {
   }
 
   if (resetFile) {
-    resetFileStorage();
-    macrodataFile = fetchFile();
+    macrodataFile.resetFile();
   }
 
   // Refinement bins
   for (let i = 0; i < 5; i++) {
     const w = width / 5;
-    refined[i] = new Bin(w, i, goal / 5, macrodataFile?.bins[i]);
+    const binLevels = macrodataFile.storedBins ? macrodataFile.storedBins[i] : undefined;
+    refined[i] = new Bin(w, i, goal / 5, binLevels);
   }
 
   mde = false;
@@ -114,7 +114,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   smaller = min(width, height);
 
-  macrodataFile = fetchFile();
+  macrodataFile = new MacrodataFile();
 
   sharedImg.resize(smaller * 0.5, 0);
   nopeImg.resize(smaller * 0.5, 0);
@@ -226,7 +226,7 @@ function draw() {
 
   if (percent !== prevPercent) {
     const bins = refined.map(bin => bin.levels);
-    updateFileProgress({...macrodataFile, bins});
+    macrodataFile.updateProgress(bins);
     prevPercent = percent;
   }
 
@@ -347,7 +347,7 @@ function drawTop(percent) {
   if (macrodataFile) {
     fill(255);
     stroke(0);
-    text(macrodataFile.file, w * 0.175, 50);
+    text(macrodataFile.fileName, w * 0.175, 50);
   }
   fill(0);
   stroke(255);
