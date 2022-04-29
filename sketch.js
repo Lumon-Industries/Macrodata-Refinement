@@ -39,24 +39,10 @@ let shared = false;
 let sharedImg;
 let sharedTime = 0;
 
-// Coordinates of your data
-let coordinates = `0x6AF307:0x38A6B7`;
-
 let shareDiv;
 
-// file for refining to be assigned or retrieved from local storage
+// holds filename, initial bin levels, coordinates
 let macrodataFile;
-
-// Function to pick coordinates
-function randHex() {
-  return floor(random(0, 256)).toString(16).toUpperCase();
-}
-
-function generateCoordinates() {
-  let x = randHex() + randHex() + randHex();
-  let y = randHex() + randHex() + randHex();
-  coordinates = `${x}:${y}`;
-}
 
 function preload() {
   lumon = loadImage('images/lumon.png');
@@ -67,7 +53,6 @@ function preload() {
 }
 
 function startOver(resetFile = false) {
-  generateCoordinates();
   // Create the space
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
@@ -137,7 +122,7 @@ function setup() {
       }
       thenumbers += '\n';
     }
-    const msg = `In refining ${coordinates} I have brought glory to the company.
+    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) I have brought glory to the company.
 Praise Kier.
 ${thenumbers}#mdrlumon #severance 🧇🐐🔢💯
 lumon-industries.com`;
@@ -441,7 +426,7 @@ function drawBottom() {
   textFont('Courier');
   textAlign(CENTER, CENTER);
   textSize(baseSize * 0.8);
-  text(coordinates, width * 0.5, height - 10);
+  text(macrodataFile.coordinates, width * 0.5, height - 10);
 }
 
 function drawBinned() {

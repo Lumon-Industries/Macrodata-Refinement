@@ -27,16 +27,19 @@ class MacrodataFile {
     const file = JSON.parse(localStorage.getItem(this.localStorageKey)) ?? this.assignFile();
     this.fileName = file.fileName;
     this.storedBins = file.storedBins;
+    this.coordinates = file.coordinates;
   }
 
   assignFile() {
     // quick fix to ensure you don't get the same filename twice in a row
     const allFilesButPrevious = files.filter(file => file !== this.fileName);
-    const filename = allFilesButPrevious[Math.floor(Math.random() * allFilesButPrevious.length)];
-    console.log('assigning', filename);
+    const fileName = allFilesButPrevious[Math.floor(Math.random() * allFilesButPrevious.length)];
+    const coordinates = this.#generateCoordinates();
+    console.log('assigning', fileName);
     const macrodata = {
-      fileName: filename,
-      storedBins: emptyBins
+      fileName,
+      storedBins: emptyBins,
+      coordinates
     }
     localStorage.setItem(this.localStorageKey, JSON.stringify(macrodata));
     return macrodata;
@@ -45,7 +48,8 @@ class MacrodataFile {
   updateProgress(bins) {
     const updatedFile = {
       fileName: this.fileName,
-      storedBins: bins
+      storedBins: bins,
+      coordinates: this.coordinates
     }
     localStorage.setItem(this.localStorageKey, JSON.stringify(updatedFile));
   }
@@ -55,5 +59,16 @@ class MacrodataFile {
     const file = this.assignFile();
     this.fileName = file.fileName;
     this.storedBins = file.storedBins;
+    this.coordinates = file.coordinates;
+  }
+
+  // private member fn to pick coordinates
+  #generateCoordinates() {
+    function randHex() {
+      return floor(random(0, 256)).toString(16).toUpperCase();
+    }
+    let x = randHex() + randHex() + randHex();
+    let y = randHex() + randHex() + randHex();
+    return `${x}:${y}`;
   }
 }
