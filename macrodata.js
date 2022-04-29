@@ -17,7 +17,7 @@ const macrodataKey = 'macrodata';
 
 const emptyBins = [
   {WO: 0, FC: 0, DR: 0, MA: 0},
-  {WO: 2, FC: 0, DR: 0, MA: 0},
+  {WO: 0, FC: 0, DR: 0, MA: 0},
   {WO: 0, FC: 0, DR: 0, MA: 0},
   {WO: 0, FC: 0, DR: 0, MA: 0},
   {WO: 0, FC: 0, DR: 0, MA: 0}
