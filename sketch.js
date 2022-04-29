@@ -233,6 +233,10 @@ function draw() {
   if (percent >= 0.75 && !mde && !mdeDone) {
     mde = true;
     mdeTime = millis();
+    if (frameCount == 1) {
+      mdeDone = true;
+      mde = false;  
+    }
   }
 
   if (millis() - mdeTime > 5 * 1000 && mde) {
