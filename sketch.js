@@ -227,6 +227,7 @@ function draw() {
   if (percent !== prevPercent) {
     const bins = refined.map(bin => bin.levels);
     updateFileProgress({...macrodataFile, bins});
+    prevPercent = percent;
   }
 
   if (percent >= 0.75 && !mde && !mdeDone) {
