@@ -6,28 +6,34 @@ class Data {
     this.x = x;
     this.y = y;
     this.color = palette.FG; //TODO: pass this in as arg rather than global variable?
+    this.alpha = 255;
     this.sz = baseSize;
     this.refined = false;
     this.binIt = false;
     this.bin = undefined;
+    this.binPause = 30;
   }
-
+  
   refine(bin) {
     this.binIt = true;
     this.bin = bin;
   }
-
+  
   goBin() {
     // This is a band-aid
     if (this.bin) {
       this.bin.open();
-
-      let targetX = g.width / 2;
-      let targetY = g.height;
-      if (this.bin) this.x = lerp(this.x, this.bin.x, random(0, 0.2));
-      this.y = lerp(this.y, this.bin.y, random(0, 0.2));
-      this.x += random(-5, 5);
-      this.y += random(-5, 5);
+      if (this.binPause <= 0) {
+        const dx = this.bin.x - this.x;
+        const dy = this.bin.y - this.y;
+        let easing = map(abs(dy), this.bin.y, this.homeY, 0.02, 0.1);
+        this.x += min(dx * easing, 20);
+        this.y += min(dy * easing, 20);
+        this.alpha = map(this.y, this.homeY, this.bin.y, 255, 5);
+        this.bin.lastRefinedTime = millis();
+      } else {
+        this.binPause--;
+      }
       if (dist(this.x, this.y, this.bin.x, this.bin.y) < 2) {
         this.bin.addNumber();
         this.num = floor(random(10));
@@ -37,6 +43,8 @@ class Data {
         this.binIt = false;
         this.bin = undefined;
         this.color = palette.FG;
+        this.alpha = 255;
+        this.binPause = 30;
       }
     }
   }
@@ -68,7 +76,12 @@ class Data {
     g.textFont('Courier');
     g.textSize(this.sz);
     g.textAlign(CENTER, CENTER);
-    g.fill(this.color);
+    // g.fill(this.color);
+    const col = color(this.color);
+    col.setAlpha(this.alpha);
+    g.fill(col);
+    g.stroke(col);
+    
     g.text(this.num, this.x, this.y);
 
     // rectMode(CENTER);
