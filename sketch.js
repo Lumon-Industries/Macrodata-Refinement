@@ -39,21 +39,10 @@ let shared = false;
 let sharedImg;
 let sharedTime = 0;
 
-// Coordinates of your data
-let coordinates = `0x6AF307:0x38A6B7`;
-
 let shareDiv;
 
-// Function to pick coordinates
-function randHex() {
-  return floor(random(0, 256)).toString(16).toUpperCase();
-}
-
-function generateCoordinates() {
-  let x = randHex() + randHex() + randHex();
-  let y = randHex() + randHex() + randHex();
-  coordinates = `${x}:${y}`;
-}
+// holds filename, initial bin levels, coordinates
+let macrodataFile;
 
 function preload() {
   lumon = loadImage('images/lumon.png');
@@ -63,8 +52,7 @@ function preload() {
   mdeGIF[0] = loadImage('images/mde.gif');
 }
 
-function startOver() {
-  generateCoordinates();
+function startOver(resetFile = false) {
   // Create the space
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
@@ -82,10 +70,15 @@ function startOver() {
     }
   }
 
+  if (resetFile) {
+    macrodataFile.resetFile();
+  }
+
   // Refinement bins
   for (let i = 0; i < 5; i++) {
     const w = width / 5;
-    refined[i] = new Bin(w, i, goal / 5);
+    const binLevels = macrodataFile.storedBins ? macrodataFile.storedBins[i] : undefined;
+    refined[i] = new Bin(w, i, goal / 5, binLevels);
   }
 
   mde = false;
@@ -96,14 +89,17 @@ function startOver() {
   completed = false;
   shared = false;
   shareDiv.hide();
-}
-let zoff = 0;
 
+}
+
+let zoff = 0;
 let smaller;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   smaller = min(width, height);
+
+  macrodataFile = new MacrodataFile();
 
   sharedImg.resize(smaller * 0.5, 0);
   nopeImg.resize(smaller * 0.5, 0);
@@ -126,7 +122,7 @@ function setup() {
       }
       thenumbers += '\n';
     }
-    const msg = `In refining ${coordinates} I have brought glory to the company.
+    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) I have brought glory to the company.
 Praise Kier.
 ${thenumbers}#mdrlumon #severance 🧇🐐🔢💯
 lumon-industries.com`;
@@ -203,6 +199,8 @@ function mouseReleased() {
   }
 }
 
+let prevPercent;
+
 function draw() {
   colorMode(RGB);
   let sum = 0;
@@ -211,9 +209,19 @@ function draw() {
   }
   let percent = sum / goal;
 
+  if (percent !== prevPercent) {
+    const bins = refined.map(bin => bin.levels);
+    macrodataFile.updateProgress(bins);
+    prevPercent = percent;
+  }
+
   if (percent >= 0.75 && !mde && !mdeDone) {
     mde = true;
     mdeTime = millis();
+    if (frameCount == 1) {
+      mdeDone = true;
+      mde = false;  
+    }
   }
 
   if (millis() - mdeTime > 5 * 1000 && mde) {
@@ -264,7 +272,7 @@ function draw() {
     imageMode(CENTER);
     image(sharedImg, width * 0.5, height * 0.5);
     if (millis() - sharedTime > 10000) {
-      startOver();
+      startOver(true);
     }
   }
 
@@ -324,7 +332,14 @@ function drawTop(percent) {
   strokeWeight(4);
   textSize(32);
   textFont('Arial');
-  text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.33, 50);
+  text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.80, 50);
+  if (macrodataFile) {
+    fill(255);
+    stroke(0);
+    text(macrodataFile.fileName, w * 0.175, 50);
+  }
+  fill(0);
+  stroke(255);
 }
 
 function drawNumbers() {
@@ -411,7 +426,7 @@ function drawBottom() {
   textFont('Courier');
   textAlign(CENTER, CENTER);
   textSize(baseSize * 0.8);
-  text(coordinates, width * 0.5, height - 10);
+  text(macrodataFile.coordinates, width * 0.5, height - 10);
 }
 
 function drawBinned() {
