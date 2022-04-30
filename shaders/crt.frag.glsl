@@ -31,7 +31,7 @@ void main() {
   vec2 remappedUV = curveRemapUV(vec2(uv.xy));
   vec4 baseColor = texture2D(u_tex, remappedUV);
 
-  float line_count = 300.0;
+  float line_count = 400.0;
   float opacity = 0.65;
   float y_lines = sin(remappedUV.y * line_count * PI * 2.0);
   y_lines = (y_lines * 0.5 + 0.5) * 0.9 + 0.1;
@@ -43,7 +43,7 @@ void main() {
   // boosting the brightness, altering the hue to be more blue
   float avg = baseColor.r + baseColor.g + baseColor.b / 3.0;
   if (avg > 0.5) {
-    baseColor *= vec4(vec3(0.4, 1.3, 1.5), 1.0) * 8.0;  
+    baseColor *= vec4(vec3(0.4, 1.0, 1.2), 1.0) * 8.0;  
   } else {
       baseColor *= vec4(vec3(0.2, 1.2, 1.5), 1.0) * 2.0;  
   }

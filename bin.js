@@ -116,7 +116,7 @@ class Bin {
   }
 
   writeIndex() {
-    g.textSize(16);
+    g.textSize(18);
     g.textFont('Arial');
     g.textAlign(CENTER, CENTER);
     g.fill(palette.FG);
@@ -222,7 +222,6 @@ class Bin {
       rw * 0.7,
       buffer * 0.15
     );
-
     // Draw the filled bar inside of the progress bar.
     g.fill(levelColor);
     let w = (rw * 0.7 * this.levels[level]) / this.levelGoal;
