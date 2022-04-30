@@ -274,4 +274,10 @@ class Bin {
     g.endShape(CLOSE);
     g.pop();
   }
+
+  resize(newW) {
+    this.w = newW;
+    this.x = this.i * newW + newW * 0.5;
+    this.y = g.height - buffer * 0.75;    
+  }
 }
