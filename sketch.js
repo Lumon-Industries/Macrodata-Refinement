@@ -301,9 +301,11 @@ function draw() {
   drawBinned();
 
   g.imageMode(CORNER);
+  if (!useShader) g.tint(mobilePalette.FG);
   g.image(lumon, g.width - lumon.width, 0);
   if (nope) {
     g.imageMode(CENTER);
+    if (!useShader) g.tint(mobilePalette.FG);
     g.image(nopeImg, g.width * 0.5, g.height * 0.5);
     if (millis() - nopeTime > 1000) {
       nope = false;
@@ -312,11 +314,13 @@ function draw() {
 
   if (completed) {
     g.imageMode(CENTER);
+    if (!useShader) g.tint(mobilePalette.FG);
     g.image(completedImg, g.width * 0.5, g.height * 0.5);
   }
 
   if (shared) {
     g.imageMode(CENTER);
+    if (!useShader) g.tint(mobilePalette.FG);
     g.image(sharedImg, g.width * 0.5, g.height * 0.5);
     if (millis() - sharedTime > 10000) {
       startOver(true);
