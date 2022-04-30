@@ -2,6 +2,7 @@ const keys = ['WO', 'FC', 'DR', 'MA'];
 const maxLidAngle = 45;
 const closedLidAngle = 180;
 const maxShowTime = 1000;
+const lidOpenCloseTime = 1500;
 
 let levelH = buffer * 1.7;
 
@@ -16,6 +17,7 @@ class Bin {
     this.levelGoal = this.goal / 4;
 
     this.levelsYOffset = levelH;
+    this.lastRefinedTime = millis();
 
 // if levels is undefined, assign empty levels
     this.levels = levels ?? {
@@ -149,7 +151,7 @@ class Bin {
       this.drawLevel(i, levelY + this.levelsYOffset, rw, buffer);
     }
 
-    if (millis() - this.showTime > maxShowTime) {
+    if (millis() - this.lastRefinedTime > 120) {
       if (!this.openingAnimation) {
         this.lidAngle = maxLidAngle;
         if (!this.closingAnimation) {
@@ -185,7 +187,7 @@ class Bin {
       this.lidAngle = map(
         millis() - this.animationStartTime,
         0,
-        maxShowTime,
+        lidOpenCloseTime,
         maxLidAngle,
         closedLidAngle
       );
