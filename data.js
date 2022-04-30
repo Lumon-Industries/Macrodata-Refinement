@@ -26,9 +26,9 @@ class Data {
       if (this.binPause <= 0) {
         const dx = this.bin.x - this.x;
         const dy = this.bin.y - this.y;
-        let easing = map(abs(dy), this.bin.y, this.homeY, 0.02, 0.1);
-        this.x += min(dx * easing, 20);
-        this.y += min(dy * easing, 20);
+        let easing = map(abs(dy), this.bin.y, 0, 0.02, 0.1);
+        this.x += dx * easing;
+        this.y += max(dy * easing, -20);
         this.alpha = map(this.y, this.homeY, this.bin.y, 255, 5);
         this.bin.lastRefinedTime = millis();
       } else {
@@ -74,9 +74,10 @@ class Data {
 
   show() {
     g.textFont('Courier');
-    g.textSize(this.sz);
+    // if the digit is ready to be binned, lerp to a large size proprtional to the pause time
+    const digitSize = this.binIt ? lerp(this.sz, baseSize * 2.5, map(this.binPause, 30, 0, 0, 1)) : this.sz;
+    g.textSize(digitSize);
     g.textAlign(CENTER, CENTER);
-    // g.fill(this.color);
     const col = color(this.color);
     col.setAlpha(this.alpha);
     g.fill(col);
