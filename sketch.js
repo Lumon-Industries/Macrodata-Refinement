@@ -41,6 +41,26 @@ let sharedTime = 0;
 
 let shareDiv;
 
+// for CRT Shader
+let shaderLayer, crtShader;
+let g; //p5 graphics instance
+let useShader;
+
+// Background and Foreground colours
+const mobilePalette = {
+  BG: '#010A13',
+  FG: '#ABFFE9',
+  SELECT: '#FA8585'
+}
+
+const shaderPalette = {
+  BG: '#111111',
+  FG: '#fff',
+  SELECT: '#ff0000',
+};
+
+let palette = mobilePalette;
+
 // holds filename, initial bin levels, coordinates
 let macrodataFile;
 
@@ -50,6 +70,8 @@ function preload() {
   completedImg = loadImage('images/100.png');
   sharedImg = loadImage('images/clipboard.png');
   mdeGIF[0] = loadImage('images/mde.gif');
+
+  crtShader = loadShader('shaders/crt.vert.glsl', 'shaders/crt.frag.glsl')
 }
 
 function startOver(resetFile = false) {
@@ -57,10 +79,10 @@ function startOver(resetFile = false) {
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
   osn = new OpenSimplexNoise();
-  cols = floor(width / r);
-  rows = floor((height - buffer * 2) / r);
+  cols = floor(g.width / r);
+  rows = floor((g.height - buffer * 2) / r);
 
-  let wBuffer = width - cols * r;
+  let wBuffer = g.width - cols * r;
   for (let j = 0; j < rows; j++) {
     for (let i = 0; i < cols; i++) {
       let x = i * r + r * 0.5 + wBuffer * 0.5;
@@ -76,7 +98,7 @@ function startOver(resetFile = false) {
 
   // Refinement bins
   for (let i = 0; i < 5; i++) {
-    const w = width / 5;
+    const w = g.width / 5;
     const binLevels = macrodataFile.storedBins ? macrodataFile.storedBins[i] : undefined;
     refined[i] = new Bin(w, i, goal / 5, binLevels);
   }
@@ -97,7 +119,28 @@ let smaller;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  smaller = min(width, height);
+  frameRate(30);
+  
+  // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
+  g = createGraphics(windowWidth, windowHeight);
+
+  // We don't want to use shader on mobile
+  useShader = !isTouchScreenDevice();
+  
+  // The shader boosts colour values so we reset the palette if using shader
+  if (useShader) {
+    palette = shaderPalette;
+  }
+  
+  // force pixel density to 1 to improve perf on retina screens
+  pixelDensity(1);
+  
+  // p5 graphics element to draw our shader output to
+  shaderLayer = createGraphics(g.width, g.height, WEBGL);
+  shaderLayer.noStroke();  
+  crtShader.setUniform('u_resolution', [g.width, g.height]);
+  
+  smaller = min(g.width, g.height);
 
   macrodataFile = new MacrodataFile();
 
@@ -111,7 +154,7 @@ function setup() {
   shareDiv = createDiv('');
   shareDiv.hide();
   //shareDiv.style("background-color", "#AAA");
-  shareDiv.position(width * 0.5 - shw * 0.5, height * 0.5 - shh * 0.5);
+  shareDiv.position(g.width * 0.5 - shw * 0.5, g.height * 0.5 - shh * 0.5);
   shareDiv.style('width', `${shw}px`);
   shareDiv.style('height', `${shh}px`);
   shareDiv.mousePressed(function () {
@@ -174,7 +217,7 @@ function mouseReleased() {
       }
       total++;
     }
-    num.turn(255, 255, 255);
+    num.turn(palette.FG);
     num.refined = false;
   }
   // half of numbers must be refinable
@@ -202,7 +245,7 @@ function mouseReleased() {
 let prevPercent;
 
 function draw() {
-  colorMode(RGB);
+  g.colorMode(RGB);
   let sum = 0;
   for (let bin of refined) {
     sum += bin.count;
@@ -241,8 +284,8 @@ function draw() {
     sharedTime = millis();
   }
 
-  background(0);
-  textFont('Courier');
+  g.background(palette.BG);
+  g.textFont('Courier');
 
   drawTop(percent);
   drawNumbers();
@@ -250,34 +293,34 @@ function draw() {
 
   drawBinned();
 
-  imageMode(CORNER);
-  image(lumon, width - lumon.width, 0);
+  g.imageMode(CORNER);
+  g.image(lumon, g.width - lumon.width, 0);
   if (nope) {
-    imageMode(CENTER);
-    image(nopeImg, width * 0.5, height * 0.5);
+    g.imageMode(CENTER);
+    g.image(nopeImg, g.width * 0.5, g.height * 0.5);
     if (millis() - nopeTime > 1000) {
       nope = false;
     }
   }
 
   if (completed) {
-    imageMode(CENTER);
-    image(completedImg, width * 0.5, height * 0.5);
+    g.imageMode(CENTER);
+    g.image(completedImg, g.width * 0.5, g.height * 0.5);
     // if (millis() - completedTime > 5000) {
     //   startOver();
     // }
   }
 
   if (shared) {
-    imageMode(CENTER);
-    image(sharedImg, width * 0.5, height * 0.5);
+    g.imageMode(CENTER);
+    g.image(sharedImg, g.width * 0.5, g.height * 0.5);
     if (millis() - sharedTime > 10000) {
       startOver(true);
     }
   }
 
   if (mde) {
-    colorMode(HSB);
+    g.colorMode(HSB);
     let dim = 5;
     let yoff = 100;
     let inc = 0;
@@ -285,18 +328,20 @@ function draw() {
     for (let i = 0; i < dim; i++) {
       let xoff = 100;
       for (let j = 0; j < dim; j++) {
-        let w = width / dim;
-        let h = height / dim;
-        noStroke();
+        const currGifFrame = (frameCount + ((i+j))) % mdeGIF[0].gifProperties.numFrames;
+        mdeGIF[0].setFrame(currGifFrame);
+        let w = g.width / dim;
+        let h = g.height / dim;
+        g.noStroke();
         let hu = map(osn.noise3D(xoff, yoff, zoff * 2), -1, 1, -100, 500);
-        fill(hu, 255, 255, 0.2);
-        stroke(hu, 255, 255);
-        strokeWeight(4);
-        imageMode(CORNER);
-        image(mdeGIF[0], i * w, j * h, w, h);
+        g.fill(hu, 255, 255, 0.2);
+        g.stroke(hu, 255, 255);
+        g.strokeWeight(4);
+        g.imageMode(CORNER);
+        g.image(mdeGIF[0], i * w, j * h, w, h);
         index++;
-        rectMode(CORNER);
-        rect(i * w, j * h, w, h);
+        g.rectMode(CORNER);
+        g.rect(i * w, j * h, w, h);
         xoff += 5;
       }
       yoff += 5;
@@ -308,46 +353,65 @@ function draw() {
   // rotate(frameCount * 0.05);
   // image(mdeGIF, 0, 0);
   // pop();
+
+  if (useShader) {
+    
+    shaderLayer.rect(0, 0, g.width, g.height);
+    shaderLayer.shader(crtShader);
+    
+    // pass the image from canvas context in to shader as uniform
+    crtShader.setUniform('u_tex', g);
+    
+    // Resetting the backgroudn to black to check we're not seeing the original drawing output 
+    background(palette.BG);
+    imageMode(CORNER);
+    image(shaderLayer, 0, 0, g.width, g.height);
+  } else {
+    image(g, 0, 0, g.width, g.height);
+  }
+
+  // Displays FPS in top left corner, helpful for debugging
+  // drawFPS();
 }
 
 function drawTop(percent) {
-  rectMode(CORNER);
-  stroke(255);
-  let w = width * 0.9;
-  strokeWeight(2);
-  let wx = (width - w) * 0.5;
-  noFill();
-  rect(wx, 25, w, 50);
-  noStroke();
-  fill(255);
+  g.rectMode(CORNER);
+  g.stroke(palette.FG);
+  let w = g.width * 0.9;
+  g.strokeWeight(2);
+  let wx = (g.width - w) * 0.5;
+  g.noFill();
+  g.rect(wx, 25, w, 50);
+  g.noStroke();
+  g.fill(palette.FG);
 
   let realW = w - lumon.width * 0.4;
   let pw = realW * percent;
 
-  rect(wx + realW - pw, 25, pw, 50);
+  g.rect(wx + realW - pw, 25, pw, 50);
   // rect(w * (1.0 - percent) + (width - w) * 0.5, 25, pw, 50);
-  noFill();
-  fill(0);
-  stroke(255);
-  strokeWeight(4);
-  textSize(32);
-  textFont('Arial');
-  text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.80, 50);
+  g.noFill();
+  g.fill(palette.BG);
+  g.stroke(palette.FG);
+  g.strokeWeight(4);
+  g.textSize(32);
+  g.textFont('Arial');
+  g.text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.80, 50);
   if (macrodataFile) {
-    fill(255);
-    stroke(0);
-    text(macrodataFile.fileName, w * 0.175, 50);
+    g.fill(palette.FG);
+    g.stroke(palette.BG);
+    g.text(macrodataFile.fileName, w * 0.175, 50);
   }
-  fill(0);
-  stroke(255);
+  g.fill(palette.BG);
+  g.stroke(palette.FG);
 }
 
 function drawNumbers() {
-  rectMode(CENTER);
-  noFill();
-  strokeWeight(1);
-  line(0, buffer, width, buffer);
-  line(0, height - buffer, width, height - buffer);
+  g.rectMode(CENTER);
+  g.noFill();
+  g.strokeWeight(1);
+  g.line(0, buffer, g.width, buffer);
+  g.line(0, g.height - buffer, g.width, g.height - buffer);
   //rect(width * 0.5, height * 0.5, width * 2, 20 + height - buffer * 2);
   //rect(width * 0.5, height * 0.5, width * 2, 30 + height - buffer * 2);
 
@@ -376,7 +440,7 @@ function drawNumbers() {
 
       let sz = n * baseSize * 4 + baseSize;
       let d = dist(mouseX, mouseY, num.x, num.y);
-      if (d < width * 0.1) {
+      if (d < g.width * 0.1) {
         //sz += map(d, 0, width * 0.1, 24, 0);
         num.x += random(-1, 1);
         num.y += random(-1, 1);
@@ -398,39 +462,54 @@ function drawBottom() {
   }
 
   if (refining) {
-    push();
-    rectMode(CORNERS);
-    stroke(255);
-    noFill();
-    rect(refineTX, refineTY, refineBX, refineBY);
+    g.push();
+    g.rectMode(CORNERS);
+    g.stroke(palette.FG);
+    g.noFill();
+    g.rect(refineTX, refineTY, refineBX, refineBY);
 
     for (let num of numbers) {
       if (
         num.inside(refineTX, refineTY, refineBX, refineBY) &&
         num.sz > baseSize
       ) {
-        num.turn(255, 0, 0);
+        num.turn(palette.SELECT);
         num.refined = true;
       } else {
-        num.turn(255, 255, 255);
+        num.turn(palette.FG);
         num.refined = false;
       }
     }
-    pop();
+    g.pop();
   }
-
-  rectMode(CORNER);
-  fill(255);
-  rect(0, height - 20, width, 20);
-  fill(0);
-  textFont('Courier');
-  textAlign(CENTER, CENTER);
-  textSize(baseSize * 0.8);
-  text(macrodataFile.coordinates, width * 0.5, height - 10);
+  g.rectMode(CORNER);
+  g.fill(palette.FG);
+  g.rect(0, g.height - 20, g.width, 20);
+  g.fill(palette.BG);
+  g.textFont('Courier');
+  g.textAlign(CENTER, CENTER);
+  g.textSize(baseSize * 0.8);
+  g.text(macrodataFile.coordinates, g.width * 0.5, g.height - 10);
 }
 
 function drawBinned() {
   for (let num of numbers) {
     if (num.binIt) num.show();
   }
+}
+
+function drawFPS() {
+  textSize(24);
+  fill(palette.FG);
+  noStroke();
+  text(frameRate().toFixed(2), 50, 25);
+}
+
+function toggleShader() {
+  if (useShader) {
+    palette = mobilePalette
+  } else {
+    palette = shaderPalette;
+  }
+  useShader = !useShader;
 }

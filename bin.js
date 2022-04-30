@@ -10,9 +10,9 @@ class Bin {
     this.w = w;
     this.i = i;
     this.x = i * w + w * 0.5;
-    this.y = height - buffer * 0.75;
-    this.goal = goal;
+    this.y = g.height - buffer * 0.75;
 
+    this.goal = goal;
     this.levelGoal = this.goal / 4;
 
     this.levelsYOffset = levelH;
@@ -60,13 +60,13 @@ class Bin {
   }
 
   show() {
-    push();
+    g.push();
     this.count =
       this.levels.WO + this.levels.FC + this.levels.DR + this.levels.MA;
 
     this.count = constrain(this.count, 0, this.goal);
     let perc = this.count / this.goal;
-    rectMode(CENTER);
+    g.rectMode(CENTER);
     let rw = this.w - this.w * 0.25;
 
     if (this.showLevels) {
@@ -78,56 +78,56 @@ class Bin {
     this.drawProgressBar(rw, buffer, perc);
     this.writeIndex();
     this.writePercentage(perc, rw, buffer);
-
-    pop();
+    
+    g.pop();
   }
 
   drawBottomOutlines(rw, buffer) {
     // Extra layer to block tray sliding
-    noStroke();
-    fill(0);
-    rectMode(CORNER);
+    g.noStroke();
+    g.fill(palette.BG);
+    g.rectMode(CORNER);
     let extra = 4;
-    rect(
+    g.rect(
       this.x - rw * 0.5 - extra,
       this.y - buffer * 0.125,
       rw + extra * 2,
       buffer
     );
 
-    stroke(255);
-    strokeWeight(1);
-    fill(0);
+    g.stroke(palette.FG);
+    g.strokeWeight(1);
+    g.fill(palette.BG);
 
-    rectMode(CENTER);
-    rect(this.x, this.y, rw, buffer * 0.25);
-    rect(this.x, this.y + buffer * 0.3, rw, buffer * 0.25);
+    g.rectMode(CENTER);
+    g.rect(this.x, this.y, rw, buffer * 0.25);
+    g.rect(this.x, this.y + buffer * 0.3, rw, buffer * 0.25);
   }
 
   drawProgressBar(rw, buffer, perc) {
-    fill(255);
-    noStroke();
-    rectMode(CORNER);
+    g.fill(palette.FG);
+    g.noStroke();
+    g.rectMode(CORNER);
 
     let h = buffer * 0.25;
-    rect(this.x - rw * 0.5, this.y + buffer * 0.3 - h * 0.5, rw * perc, h);
+    g.rect(this.x - rw * 0.5, this.y + buffer * 0.3 - h * 0.5, rw * perc, h);
   }
 
   writeIndex() {
-    textSize(16);
-    textFont('Arial');
-    textAlign(CENTER, CENTER);
-    fill(255);
-    noStroke();
-    text(nf(this.i, 2, 0), this.x, this.y);
+    g.textSize(16);
+    g.textFont('Arial');
+    g.textAlign(CENTER, CENTER);
+    g.fill(palette.FG);
+    g.noStroke();
+    g.text(nf(this.i, 2, 0), this.x, this.y);
   }
 
   writePercentage(perc, rw, buffer) {
-    textAlign(LEFT, CENTER);
-    stroke(255);
-    strokeWeight(2);
-    fill(0);
-    text(
+    g.textAlign(LEFT, CENTER);
+    g.stroke(palette.FG);
+    g.strokeWeight(2);
+    g.fill(palette.BG);
+    g.text(
       `${floor(nf(100 * perc, 2, 0))}%`,
       this.x - rw * 0.45,
       this.y + buffer * 0.3
@@ -135,13 +135,13 @@ class Bin {
   }
 
   drawLevels(rw, buffer) {
-    rectMode(CENTER);
+    g.rectMode(CENTER);
     let levelY = this.y - buffer;
 
     // Draw main outline
-    stroke(255);
-    fill(0);
-    rect(this.x, levelY + this.levelsYOffset, rw, levelH);
+    g.stroke(palette.FG);
+    g.fill(palette.BG);
+    g.rect(this.x, levelY + this.levelsYOffset, rw, levelH);
 
     this.drawBinLids(rw, buffer);
 
@@ -206,12 +206,12 @@ class Bin {
   }
 
   drawLevel(i, y, rw, buffer) {
-    rectMode(CORNER);
-    stroke('255');
-    noFill();
+    g.rectMode(CORNER);
+    g.stroke(palette.FG);
+    g.noFill();
 
     // Draw the outline of the progress bar
-    rect(
+    g.rect(
       this.x - rw * 0.25,
       y - buffer + i * buffer * 0.35,
       rw * 0.7,
@@ -219,16 +219,16 @@ class Bin {
     );
 
     // Draw the filled bar inside of the progress bar.
-    fill(255);
+    g.fill(palette.FG);
     let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
-    rect(this.x - rw * 0.25, y - buffer + i * buffer * 0.35, w, buffer * 0.15);
+    g.rect(this.x - rw * 0.25, y - buffer + i * buffer * 0.35, w, buffer * 0.15);
 
     // Draw the label for the progress bar.
-    textAlign(LEFT, CENTER);
-    noStroke();
-    fill(255);
-    textSize(16);
-    text(
+    g.textAlign(LEFT, CENTER);
+    g.noStroke();
+    g.fill(palette.FG);
+    g.textSize(16);
+    g.text(
       keys[i - 1],
       this.x - rw * 0.45,
       y - buffer + i * buffer * 0.35 + buffer * 0.075
@@ -238,16 +238,16 @@ class Bin {
   drawBinLids(rw, buffer) {
     let angle = radians(-this.lidAngle);
 
-    stroke(255);
-    fill(0);
+    g.stroke(palette.FG);
+    g.fill(palette.BG);
 
     // Draw the top part of the lid.
-    this.drawHalfBinLid(this.x + rw * 0.5, height - buffer, angle, rw);
+    this.drawHalfBinLid(this.x + rw * 0.5, g.height - buffer, angle, rw);
 
     angle = radians(180 + this.lidAngle);
 
     // Draw left bin lid
-    this.drawHalfBinLid(this.x - rw * 0.5, height - buffer, angle, rw);
+    this.drawHalfBinLid(this.x - rw * 0.5, g.height - buffer, angle, rw);
   }
 
   drawHalfBinLid(x, y, angle, rw) {
@@ -263,15 +263,15 @@ class Bin {
 
     // In the show we see that the lids do not have 90 degree angles, which means that we cannot use the rect() function.
 
-    push();
-    beginShape();
-    translate(x, y);
-    vertex(0, 0);
-    vertex(doorXLength, doorYLength);
+    g.push();
+    g.beginShape();
+    g.translate(x, y);
+    g.vertex(0, 0);
+    g.vertex(doorXLength, doorYLength);
     // Move down
-    vertex(doorXLength, doorYLength + lidThickness);
-    vertex(0, lidThickness);
-    endShape(CLOSE);
-    pop();
+    g.vertex(doorXLength, doorYLength + lidThickness);
+    g.vertex(0, lidThickness);
+    g.endShape(CLOSE);
+    g.pop();
   }
 }
