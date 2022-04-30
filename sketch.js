@@ -48,8 +48,8 @@ let useShader;
 
 // Background and Foreground colours
 const mobilePalette = {
-  BG: '#011A32',
-  FG: '#C4FFFF',
+  BG: '#010A13',
+  FG: '#ABFFE9',
   SELECT: '#FA8585'
 }
 
