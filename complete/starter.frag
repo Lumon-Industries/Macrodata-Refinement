@@ -2,6 +2,8 @@
 // by Martijn Steinrucken aka The Art of Code/BigWings - 2020
 // YouTube: youtube.com/TheArtOfCodeIsCool
 
+//Dissolve shader code ported from  https://www.shadertoy.com/view/stG3Rh
+
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -49,6 +51,14 @@ float sdSegment( vec2 uv, vec2 a, vec2 b) {
   vec2 pa = uv-a, ba = b-a;
   float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
   return length( pa-ba*h );
+}
+
+float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
+{
+    r.xy = (p.x>0.0)?r.xy : r.zw;
+    r.x  = (p.y>0.0)?r.x  : r.y;
+    vec2 q = abs(p)-b+r.x;
+    return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;
 }
 
 // From from Inigo Quilez
@@ -136,7 +146,33 @@ vec3 complete( vec2 uv) {
 }
 
 // Functions to create clouds
+float sdCloud1( vec2 uv, float x, float y) {
+   float d1 = sdRoundedBox(uv  - vec2(x, y), vec2(.14, .040), vec4(.05, .03, .05, .03) );
+   float m1 = S(0.008, 0., d1);
+   float d2 = sdEllipse(uv - vec2(x - .035, y+.01), vec2(.05, .05));
+   float m2 = S(0.008, .00, d2);
+   float d3 = sdEllipse(uv - vec2(x + .06, y+.03), vec2(.045, .06));
+   float m3 = S(0.008, .00, d3);
+   float d4 = sdEllipse(uv - vec2(x - .02 , y+.04), vec2(.05, .04));
+   float m4 = S(0.008, .00, d4);
+   float m5 = max(m1, m2);
+   float m6 = max(m3, m4);
+   return max(m5, m6);
+}
 
+float sdCloud2( vec2 uv, float x, float y) {
+   float d1 = sdRoundedBox(uv  - vec2(x, y), vec2(.14, .04), vec4(.05, .03, .05, .03) );
+   float m1 = S(0.008, 0., d1);
+   float d2 = sdEllipse(uv - vec2(x + .07, y+.02), vec2(.03, .055));
+   float m2 = S(0.008, .00, d2);
+   float d3 = sdEllipse(uv - vec2(x - .06, y+.02), vec2(.05, .06));
+   float m3 = S(0.008, .00, d3);
+   float d4 = sdEllipse(uv - vec2(x , y + 0.03), vec2(.055, 0.065));
+   float m4 = S(0.008, .00, d4);
+   float m5 = max(m1, m2);
+   float m6 = max(m3, m4);
+   return max(m5, m6);
+}
 
 float smax( in float a, in float b, float k)
 {
@@ -144,6 +180,7 @@ float smax( in float a, in float b, float k)
  return max(a,b) + h*h*0.25/k;
 }
 
+// Noise functions from Inigo Quilez; used to create CRT effect
 float N21( vec2 p) {
     return fract( sin(p.x*100. + p.y*6574.)*5674. );
 }
@@ -214,28 +251,23 @@ float fbm2( vec2 p)
    return f;
 }
 
-mat2 Rot(float a) {
-    float s=sin(a), c=cos(a);
-    return mat2(c, -s, s, c);
+// Random noise functions
+float random(vec2 uv) {
+  return fract(sin(dot(uv, vec2(15.15377, 42.43145))) * 15941.5731 * sin( iTime * 0.3));
 }
 
-float hash11(float p) {
-    // From Dave Hoskins
-	vec3 p3  = fract(vec3(p) * MOD3);
-    p3 += dot(p3, p3.yzx + 19.19);
-    return fract((p3.x + p3.y) * p3.z);
+float noise(vec2 uv) {
+  vec2 i = floor(uv);
+  vec2 f = fract(uv);
+  float a = random(i);
+  float b = random(i + vec2(1.,0.));
+  float c = random( i + vec2(0., 1.));
+  float d = random(i + vec2(1.));
+  
+  vec2 u = S(0., 1., f);
+  return mix(a, b, u.x) + (c-a)*u.y * (1. - u.x) + (d-b) * u.x*u.y;
 }
 
-//  1 out, 2 in...
-float hash12(vec2 p) {
-	vec3 p3  = fract(vec3(p.xyx) * MOD3);
-    p3 += dot(p3, p3.yzx + 19.19);
-    return fract((p3.x + p3.y) * p3.z);
-}
-
-float remap(float a, float b, float c, float d, float t) {
-	return ((t-a) / (b-a)) * (d-c) + c;
-}
 
 // Use psuedo random noise to get the height of the mountains
 float getHeight(float x) {
@@ -243,34 +275,18 @@ float getHeight(float x) {
  return sin(x)  + sin(x*2.234 + .123)*cos(x) + sin(x*4.45 + 2.234)*.25;
 }
 
-
-float hill(vec2 uv) {
-  vec3 col = vec3(0);
-  float d = length( uv - vec2( 0., clamp(uv.y, -.5, .5) ) );
-  float r = mix(.1, .01, S(-.5,.5, uv.y));
-  float m = S(.02, .0, d-r);
-  float thickness = .45;
-  //float ran = getHeight(uv.x);
-  float x = abs(uv.x);
-  // Define curvature of hill
-  float curvature = (1. - x) * pow(x, 2.) + x * (1. - pow(x, 2.));
-  float y = abs(curvature+uv.y);
-  
-  //Take abs(uv.y) to get convex shape
-  float h= S(.01, .0, abs((y)) - thickness);
-  
-  return h ;
-}
-
- vec4 Layer(vec2 uv, float blur)
+vec4 Layer(vec2 uv, float blur)
   {
-     vec4 col = vec4(0);   float x = abs(uv.x);
+     vec4 col = vec4(0); 
+     float x = abs(uv.x);
      float y1 = getHeight(uv.x);
-     float y2 = (1. - x) * pow(x, 2.) + x * (1. - pow(x, 2.));
-     float y = smax(y1, y2, .2);
-    //float y = min(y1, y2);
-     col += S(blur, -blur, uv.y + 1.2*y);
-  return col;
+     //float y2 = (1. - x) * pow(x, 2.) + x * (1. - pow(x, 2.));
+     //float y = smax(y1, y2, .2);
+     float m =  S(blur, -blur, uv.y + y1);
+     // float y2 = (1. - x) * pow(x, 2.) + x * (1. - pow(x, 2.));
+     // float y = smax(y1, y2, .2);
+     // float m =  S(blur, -blur, uv.y + 1.2*y);
+     return col + m;
  }
 
 // Functions to create crt filter
@@ -297,41 +313,7 @@ float scanline( vec2 uv, float lines, float speed) {
   
 }
 
-// Random noise functions
-float random(vec2 uv) {
-  return fract(sin(dot(uv, vec2(15.15377, 42.43145))) * 15941.5731 * sin( iTime * 0.3));
-}
-
-float noise(vec2 uv) {
-  vec2 i = floor(uv);
-  vec2 f = fract(uv);
-  float a = random(i);
-  float b = random(i + vec2(1.,0.));
-  float c = random( i + vec2(0., 1.));
-  float d = random(i + vec2(1.));
-  
-  vec2 u = S(0., 1., f);
-  return mix(a, b, u.x) + (c-a)*u.y * (1. - u.x) + (d-b) * u.x*u.y;
-}
-
-float hash(vec2 p)  // replace this by something better
-{   
-    p = 50.0 * fract(p * 0.3183099 + vec2(0.71,0.113));
-    return -1.0+2.0*fract( p.x*p.y*(p.x+p.y) );
-}
-
-// float noise( in vec2 p )
-// {
-//     vec2 i = floor( p );
-//     vec2 f = fract( p );
-// 	vec2 u = f*f*(3.0-2.0*f);
-                     
-//     return mix( mix( hash( i + vec2(0.0,0.0) ), 
-//                      hash( i + vec2(1.0,0.0) ), u.x),
-//                 mix( hash( i + vec2(0.0,1.0) ), 
-//                      hash( i + vec2(1.0,1.0) ), u.x), u.y);
-// }
-
+// Function to create dissolve effect
 float rule(vec2 p)
 {
 	vec2 uv = p * vec2(u_resolution.x/u_resolution.y,1.0) * 37.0;
@@ -349,21 +331,22 @@ void main( )
 {
 	vec2 uv = gl_FragCoord.xy / u_resolution.y;
   
+    // Create new uv for 100% 
     vec2 gv = (gl_FragCoord.xy-.5*u_resolution.xy) / u_resolution.y;
   
-    vec2 crt_uv = crt_coords(uv, 4.) ;
+    // Code for CRT filter
+    vec2 crt_uv = crt_coords(uv, 4.) ; 
+    float f = fbm2( 6.0 * crt_uv ); // Adjust parameter here to make variation more pronounced
     
+    // Code for dissolve filter
     float rule = rule(uv);
     float p0 = S(rule, rule + 0.25, iTime*.33);
-  
-    float t = iTime*.15;
+    float t = iTime*.04;
     
-    
-    uv *= 1.;
-   // add a target for the camera
+   // Add a target for the camera
     vec3 ta = vec3(0.0,0.0,0.0);
     
-    vec3 ro = ta + vec3(1.5*sin(iTime),0.0,1.5*cos(iTime));  // origin of camera (ta moves camera up)
+    vec3 ro = ta + vec3(1.5*sin(iTime),0.0,-1.5*cos(iTime));  // origin of camera (ta moves camera up)
     
     vec3 ww = normalize( ta - ro); // target minus ray origin
     vec3 uu = normalize( cross(ww,vec3(0.,1.,0.)) );
@@ -371,38 +354,39 @@ void main( )
     
     vec3 rd = normalize( gv.x*uu + gv.y*vv + 1.5*ww );  // lens of camera
     
+    // Start scene with 100%
     vec3 col = NAVY;  
-    col += complete(gv);
+    col = complete(gv);
     vec4 color = vec4(col, 1.);
     
     vec4 col_alpha = vec4(BG(crt_uv, YELLOW, PINKER, .3) - 0.5*rd.y, 1.); // sky with gradient 
-      //col1 = mix(col1, vec3(0.7,0.75,0.8), exp(-10.0*rd.y) );  // add grey along the horizon by mixing 
-    //col1 = mix(col1, vec3(1.), .8*SmoothNoise(uv)); // Add some clouds
   
-    float f = fbm2( 5.0 * crt_uv ); // Adjust parameter here to make variation more pronounced
-   
+    // Create mountains
     float blur = .005;
     for(float i=0.; i<1.; i+=1./20.) {  
-        float scale = mix(2., 1., i*.5);  // make layers further away smaller
-        
-       vec4 layer = Layer(crt_uv*scale+vec2(t+ i*75., t*.1 + i + .05), blur); // add paralax
-        
+        float scale = mix(2.5, 1., i*.5);  // make layers further away smaller
+       float m = t*.1 + i + .05;
+      // vec4 layer = Layer(crt_uv*scale+vec2(t+ i*75., m), blur); // add paralax
+       vec4 layer = Layer(uv*scale+vec2( i*75., iTime *.1*i), blur); 
         // Add some brown color for the mountains
         // Make more distant peaks lighter in color
        
     	layer.rgb *= (1. - i)*LTBROWN; 
         
         col_alpha = mix(col_alpha, layer, layer.a); // Mix the sky with the mountains
-    
-        
-   // }
     }
   
-    //col = saturate(col);
+    // Add clouds to sky
+    vec3 c1 = sdCloud1(crt_uv, -t + .9 , .85)*vec3(1.0);
+    vec4 cloud1 = vec4(c1, 1.);
+    vec3 c2 = sdCloud2(crt_uv, -t + .6 , .75)*vec3(1.0);
+    vec4 cloud2 = vec4(c2, 1.);
+    vec3 c3 = sdCloud1(crt_uv, -t + 1.4 , .80)*vec3(1.0);
+    vec4 cloud3 = vec4(c3, 1.);
+    col_alpha += cloud1 + cloud2 + cloud3;
+  
+    
     float s1 = scanline(uv, 900., -2.);
-    gl_FragColor = mix(col_alpha, vec4(s1), 0.5)*vignette(uv, 1.9, .6, 8.) ;
+    gl_FragColor = mix(col_alpha, vec4(s1), 0.2)*vignette(uv, 1.5, .6, 11.) ;
     gl_FragColor = mix(color, gl_FragColor, p0);
-   // gl_FragColor = mix(gl_FragColor, vec4(noise(uv * 75.)), 0.01);
-  //gl_FragColor = vec4(mix(col1, scene1, p0), 1.);
-
 }
