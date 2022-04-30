@@ -208,10 +208,13 @@ class Bin {
   }
 
   drawLevel(i, y, rw, buffer) {
+    const level = keys[i - 1];
+    const levelColor = palette.LEVELS[level];
+    
     g.rectMode(CORNER);
-    g.stroke(palette.FG);
+    g.stroke(levelColor);
     g.noFill();
-
+    
     // Draw the outline of the progress bar
     g.rect(
       this.x - rw * 0.25,
@@ -221,17 +224,17 @@ class Bin {
     );
 
     // Draw the filled bar inside of the progress bar.
-    g.fill(palette.FG);
-    let w = (rw * 0.7 * this.levels[keys[i - 1]]) / this.levelGoal;
+    g.fill(levelColor);
+    let w = (rw * 0.7 * this.levels[level]) / this.levelGoal;
     g.rect(this.x - rw * 0.25, y - buffer + i * buffer * 0.35, w, buffer * 0.15);
 
     // Draw the label for the progress bar.
     g.textAlign(LEFT, CENTER);
     g.noStroke();
-    g.fill(palette.FG);
+    g.fill(levelColor);
     g.textSize(16);
     g.text(
-      keys[i - 1],
+      level,
       this.x - rw * 0.45,
       y - buffer + i * buffer * 0.35 + buffer * 0.075
     );
