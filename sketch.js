@@ -188,9 +188,6 @@ lumon-industries.com`;
   startOver();
 }
 function mousePressed() {
-  if (mouseX/width >= 0.8 && mouseY/height <= 0.1) {
-    toggleShader();
-  }
   // This is the worst if statement in the history of if statements
   if (!refining && !mde && !completed && !shared) {
     refineTX = mouseX;
@@ -373,7 +370,8 @@ function draw() {
     image(g, 0, 0, g.width, g.height);
   }
 
-  drawFPS();
+  // Displays FPS in top left corner, helpful for debugging
+  // drawFPS();
 }
 
 function drawTop(percent) {
