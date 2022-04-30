@@ -16,6 +16,8 @@ let refineTX, refinteTY, refineBX, refineBY;
 
 let lumon;
 
+let startTime = 0;
+
 const emojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
 
 // Info for "nope" state
@@ -50,13 +52,13 @@ let useShader;
 const mobilePalette = {
   BG: '#010A13',
   FG: '#ABFFE9',
-  SELECT: '#FA8585'
-}
+  SELECT: '#EEFFFF',
+};
 
 const shaderPalette = {
   BG: '#111111',
-  FG: '#fff',
-  SELECT: '#ff0000',
+  FG: '#99f',
+  SELECT: '#fff',
 };
 
 let palette = mobilePalette;
@@ -71,10 +73,13 @@ function preload() {
   sharedImg = loadImage('images/clipboard.png');
   mdeGIF[0] = loadImage('images/mde.gif');
 
-  crtShader = loadShader('shaders/crt.vert.glsl', 'shaders/crt.frag.glsl')
+  crtShader = loadShader('shaders/crt.vert.glsl', 'shaders/crt.frag.glsl');
 }
 
 function startOver(resetFile = false) {
+  // Track the amount of time
+  startTime = millis();
+
   // Create the space
   r = (smaller - buffer * 2) / 10;
   baseSize = r * 0.33;
@@ -99,7 +104,9 @@ function startOver(resetFile = false) {
   // Refinement bins
   for (let i = 0; i < 5; i++) {
     const w = g.width / 5;
-    const binLevels = macrodataFile.storedBins ? macrodataFile.storedBins[i] : undefined;
+    const binLevels = macrodataFile.storedBins
+      ? macrodataFile.storedBins[i]
+      : undefined;
     refined[i] = new Bin(w, i, goal / 5, binLevels);
   }
 
@@ -111,7 +118,6 @@ function startOver(resetFile = false) {
   completed = false;
   shared = false;
   shareDiv.hide();
-
 }
 
 let zoff = 0;
@@ -120,26 +126,26 @@ let smaller;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   frameRate(30);
-  
+
   // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
   g = createGraphics(windowWidth, windowHeight);
 
   // We don't want to use shader on mobile
   useShader = !isTouchScreenDevice();
-  
+
   // The shader boosts colour values so we reset the palette if using shader
   if (useShader) {
     palette = shaderPalette;
   }
-  
+
   // force pixel density to 1 to improve perf on retina screens
   pixelDensity(1);
-  
+
   // p5 graphics element to draw our shader output to
   shaderLayer = createGraphics(g.width, g.height, WEBGL);
-  shaderLayer.noStroke();  
+  shaderLayer.noStroke();
   crtShader.setUniform('u_resolution', [g.width, g.height]);
-  
+
   smaller = min(g.width, g.height);
 
   macrodataFile = new MacrodataFile();
@@ -165,7 +171,8 @@ function setup() {
       }
       thenumbers += '\n';
     }
-    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) I have brought glory to the company.
+    const timeStr = completedTime.toLocaleString('en-US');
+    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) in ${timeStr} milliseconds I have brought glory to the company.
 Praise Kier.
 ${thenumbers}#mdrlumon #severance 🧇🐐🔢💯
 lumon-industries.com`;
@@ -253,7 +260,7 @@ function draw() {
   let percent = sum / goal;
 
   if (percent !== prevPercent) {
-    const bins = refined.map(bin => bin.levels);
+    const bins = refined.map((bin) => bin.levels);
     macrodataFile.updateProgress(bins);
     prevPercent = percent;
   }
@@ -263,7 +270,7 @@ function draw() {
     mdeTime = millis();
     if (frameCount == 1) {
       mdeDone = true;
-      mde = false;  
+      mde = false;
     }
   }
 
@@ -273,7 +280,7 @@ function draw() {
   }
 
   if (percent >= 1.0 && !completed && !shared) {
-    // completedTime = millis();
+    completedTime = millis() - startTime;
     completed = true;
     shareDiv.show();
     console.log('completed!');
@@ -306,9 +313,6 @@ function draw() {
   if (completed) {
     g.imageMode(CENTER);
     g.image(completedImg, g.width * 0.5, g.height * 0.5);
-    // if (millis() - completedTime > 5000) {
-    //   startOver();
-    // }
   }
 
   if (shared) {
@@ -328,7 +332,8 @@ function draw() {
     for (let i = 0; i < dim; i++) {
       let xoff = 100;
       for (let j = 0; j < dim; j++) {
-        const currGifFrame = (frameCount + ((i+j))) % mdeGIF[0].gifProperties.numFrames;
+        const currGifFrame =
+          (frameCount + (i + j)) % mdeGIF[0].gifProperties.numFrames;
         mdeGIF[0].setFrame(currGifFrame);
         let w = g.width / dim;
         let h = g.height / dim;
@@ -355,14 +360,13 @@ function draw() {
   // pop();
 
   if (useShader) {
-    
     shaderLayer.rect(0, 0, g.width, g.height);
     shaderLayer.shader(crtShader);
-    
+
     // pass the image from canvas context in to shader as uniform
     crtShader.setUniform('u_tex', g);
-    
-    // Resetting the backgroudn to black to check we're not seeing the original drawing output 
+
+    // Resetting the backgroudn to black to check we're not seeing the original drawing output
     background(palette.BG);
     imageMode(CORNER);
     image(shaderLayer, 0, 0, g.width, g.height);
@@ -396,7 +400,7 @@ function drawTop(percent) {
   g.strokeWeight(4);
   g.textSize(32);
   g.textFont('Arial');
-  g.text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.80, 50);
+  g.text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.8, 50);
   if (macrodataFile) {
     g.fill(palette.FG);
     g.stroke(palette.BG);
@@ -507,7 +511,7 @@ function drawFPS() {
 
 function toggleShader() {
   if (useShader) {
-    palette = mobilePalette
+    palette = mobilePalette;
   } else {
     palette = shaderPalette;
   }
