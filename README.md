@@ -1,3 +1,8 @@
+
+<!-- add Severance TV show Lumon Industries logo -->
+
+![](images/lumon-globe.png)
+
 # Macrodata Refinement
 
 Congratulations on your new job! All of us are thrilled you've become a part of Lumon Industries. 
@@ -26,3 +31,7 @@ FC: These numbers elicit joy, gaiety or ecstasy.
 DR: These numbers elicit fear, anxiety or apprehension.
 MA: These numbers elicit rage or a desire to do harm.
 ```
+<!-- an preview image for the user, to inform what this link looks like (I find such info useful to know before i click on links) -->
+
+This is a preview of the assignment, a progress bar is at the top to inform you. These numbers are not static.
+<img height="300" src="images/capture.png">

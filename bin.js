@@ -6,24 +6,27 @@ const maxShowTime = 1000;
 let levelH = buffer * 1.7;
 
 class Bin {
-  constructor(w, i, goal) {
+  constructor(w, i, goal, levels) {
     this.w = w;
     this.i = i;
     this.x = i * w + w * 0.5;
     this.y = g.height - buffer * 0.75;
-    this.count = 0;
-    this.goal = goal;
 
+    this.goal = goal;
     this.levelGoal = this.goal / 4;
 
     this.levelsYOffset = levelH;
 
-    this.levels = {
+// if levels is undefined, assign empty levels
+    this.levels = levels ?? {
       WO: 0,
       FC: 0,
       DR: 0,
       MA: 0,
     };
+
+    // sum the levels to get current count
+    this.count = Object.values(this.levels).reduce((prev, curr) => prev + curr);
 
     this.showLevels = false;
     this.closingAnimation = false;
