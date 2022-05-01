@@ -5,7 +5,7 @@
 
 # Macrodata Refinement
 
-Congratulations on your new job! All of us are thrilled you've become a part of Lumon Industries. 
+Congratulations on your new job! All of us are thrilled you've become a part of Lumon Industries.
 
 From the humble beginnings of a small topical salve company to the world's leading pioneer in biotechnologies Lumon has thrived thanks to workers like you.
 
@@ -15,7 +15,7 @@ https://lumon-industries.com
 
 ## How will I know what to work on?
 
-First, you wll be assigned a macrodata file. This selection has been made carefully by your superior.
+First, you will be assigned a macrodata file. This selection has been made carefully by your superior.
 
 After opening your file you will be met with a sea of numbers that seems to stretch endlessly in all directions.
 
@@ -35,3 +35,10 @@ MA: These numbers elicit rage or a desire to do harm.
 
 This is a preview of the assignment, a progress bar is at the top to inform you. These numbers are not static.
 <img height="300" src="images/capture.png">
+
+
+## Sample macrodata view
+
+This is a sample of what your file might look like. If you find clusters of numbers that look scary, you should bin them.
+
+![](images/lumon-anim.gif)
