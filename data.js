@@ -11,7 +11,8 @@ class Data {
     this.refined = false;
     this.binIt = false;
     this.bin = undefined;
-    this.binPause = 30;
+    this.binPauseTime = 30;
+    this.binPause = this.binPauseTime;
   }
   
   refine(bin) {
@@ -44,7 +45,7 @@ class Data {
         this.bin = undefined;
         this.color = palette.FG;
         this.alpha = 255;
-        this.binPause = 30;
+        this.binPause = this.binPauseTime;
       }
     }
   }
