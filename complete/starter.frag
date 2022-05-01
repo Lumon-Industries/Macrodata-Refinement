@@ -387,6 +387,6 @@ void main( )
   
     
     float s1 = scanline(uv, 900., -2.);
-    gl_FragColor = mix(col_alpha, vec4(s1), 0.2)*vignette(uv, 1.5, .6, 11.) ;
+    gl_FragColor = mix(col_alpha, vec4(s1), 0.2)*vignette(uv, 1.5, .6, 10.) ;
     gl_FragColor = mix(color, gl_FragColor, p0);
 }
