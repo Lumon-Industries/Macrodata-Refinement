@@ -11,17 +11,16 @@ class Data {
     this.binIt = false;
     this.bin = undefined;
   }
-
+  
   refine(bin) {
     this.binIt = true;
     this.bin = bin;
   }
-
+  
   goBin() {
     // This is a band-aid
     if (this.bin) {
       this.bin.open();
-
       let targetX = g.width / 2;
       let targetY = g.height;
       if (this.bin) this.x = lerp(this.x, this.bin.x, random(0, 0.2));
@@ -69,10 +68,16 @@ class Data {
     g.textSize(this.sz);
     g.textAlign(CENTER, CENTER);
     g.fill(this.color);
+    
     g.text(this.num, this.x, this.y);
 
     // rectMode(CENTER);
     // noFill();
     // square(this.x, this.y, r);
+  }
+
+  resize(newX, newY) {
+    this.homeX = newX;
+    this.homeY = newY;
   }
 }
