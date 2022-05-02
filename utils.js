@@ -23,3 +23,7 @@ const isTouchScreenDevice = () => {
   }
   return hasTouchScreen;
 }
+// Takes a value in seconds, returns hh:mm:ss:ms
+const createTimeString = (seconds) => {
+  return new Date(seconds * 1000).toISOString().substring(11, 23);
+}
