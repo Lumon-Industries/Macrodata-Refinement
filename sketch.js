@@ -17,6 +17,7 @@ let refineTX, refinteTY, refineBX, refineBY;
 let lumon;
 
 let startTime = 0;
+let secondsSpentRefining = 0;
 
 const emojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
 
@@ -99,6 +100,8 @@ function startOver(resetFile = false) {
 
   if (resetFile) {
     macrodataFile.resetFile();
+    storeItem('secondsSpentRefining', 0);
+    secondsSpentRefining = 0;
   }
 
   // Refinement bins
@@ -149,6 +152,7 @@ function setup() {
   smaller = min(g.width, g.height);
 
   macrodataFile = new MacrodataFile();
+  secondsSpentRefining = getItem('secondsSpentRefining') ?? 0;
 
   sharedImg.resize(smaller * 0.5, 0);
   nopeImg.resize(smaller * 0.5, 0);
@@ -376,6 +380,15 @@ function draw() {
     image(shaderLayer, 0, 0, g.width, g.height);
   } else {
     image(g, 0, 0, g.width, g.height);
+  }
+
+
+  if (focused) {
+    secondsSpentRefining += deltaTime / 1000;
+    const roundedTime = round(secondsSpentRefining);
+    if (roundedTime % 5 == 0 && roundedTime != getItem('secondsSpentRefining')) {
+      storeItem('secondsSpentRefining', round(roundedTime));
+    }
   }
 
   // Displays FPS in top left corner, helpful for debugging
