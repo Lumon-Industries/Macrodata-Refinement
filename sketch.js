@@ -442,7 +442,8 @@ function drawNumbers() {
     let xoff = 0;
     for (let j = 0; j < rows; j++) {
       let num = numbers[i + j * cols];
-
+      if (!num) return;
+      
       if (num.binIt) {
         num.goBin();
         num.show();
@@ -532,4 +533,36 @@ function toggleShader() {
     palette = shaderPalette;
   }
   useShader = !useShader;
+}
+
+function windowResized(ev) {
+  // TODO: lots of duplicated code from startOver, better to create something reusable
+  resizeCanvas(windowWidth, windowHeight);
+  g.resizeCanvas(windowWidth, windowHeight);
+  shaderLayer.resizeCanvas(windowWidth, windowHeight)
+  crtShader.setUniform('u_resolution', [g.width, g.height]);
+
+  smaller = min(g.width, g.height);
+
+  sharedImg.resize(smaller * 0.5, 0);
+  nopeImg.resize(smaller * 0.5, 0);
+  completedImg.resize(smaller * 0.5, 0);
+  
+  refined.forEach((bin) => bin.resize(g.width / refined.length));
+  
+  r = (smaller - buffer * 2) / 10;
+  baseSize = r * 0.33;
+   
+  cols = floor(g.width / r);
+  rows = floor((g.height - buffer * 2) / r);
+  let  wBuffer =  g.width - cols * r;
+  
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      let x = i * r + r * 0.5 + wBuffer * 0.5;
+      let y = j * r + r * 0.5 + buffer;
+      const numToUpdate = numbers[i + j * cols];
+      if (numToUpdate) numToUpdate.resize(x, y);
+    }
+  }
 }

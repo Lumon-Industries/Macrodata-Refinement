@@ -79,15 +79,19 @@ class Data {
     const digitSize = this.binIt ? lerp(this.sz, baseSize * 2.5, map(this.binPause, 30, 0, 0, 1)) : this.sz;
     g.textSize(digitSize);
     g.textAlign(CENTER, CENTER);
+    
     const col = color(this.color);
     col.setAlpha(this.alpha);
     g.fill(col);
-    g.stroke(col);
-    
+    g.stroke(col);    
     g.text(this.num, this.x, this.y);
-
     // rectMode(CENTER);
     // noFill();
     // square(this.x, this.y, r);
+  }
+
+  resize(newX, newY) {
+    this.homeX = newX;
+    this.homeY = newY;
   }
 }
