@@ -53,12 +53,24 @@ const mobilePalette = {
   BG: '#010A13',
   FG: '#ABFFE9',
   SELECT: '#EEFFFF',
+  LEVELS: {
+    'WO': '#05C3A8',
+    'FC': '#1EEFFF',
+    'DR': '#DF81D5',
+    'MA': '#F9ECBB',
+  }
 };
 
 const shaderPalette = {
   BG: '#111111',
   FG: '#99f',
   SELECT: '#fff',
+  LEVELS: {
+    'WO': '#17AC97',
+    'FC': '#4ABCC5',
+    'DR': '#B962B0',
+    'MA': '#D4BB5E',
+  }
 };
 
 let palette = mobilePalette;
