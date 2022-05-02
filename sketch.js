@@ -190,12 +190,6 @@ lumon-industries.com`;
     //}
   });
 
-  // for (let i = 0; i < 1; i++) {
-  //   loadImage('mde.gif', (img) => {
-  //     mdeGIF[i] = img;
-  //   });
-  // }
-
   startOver();
 }
 function mousePressed() {
@@ -360,12 +354,6 @@ function draw() {
       yoff += 5;
     }
   }
-  // push();
-  // imageMode(CENTER);
-  // translate(width * 0.5, height * 0.5);
-  // rotate(frameCount * 0.05);
-  // image(mdeGIF, 0, 0);
-  // pop();
 
   if (useShader) {
     shaderLayer.rect(0, 0, g.width, g.height);
