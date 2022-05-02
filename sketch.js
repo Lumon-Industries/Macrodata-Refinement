@@ -390,7 +390,7 @@ function draw() {
     secondsSpentRefining += deltaTime / 1000;
     const roundedTime = round(secondsSpentRefining);
     if (roundedTime % 5 == 0 && roundedTime != lastRefiningTimeStored) {
-      storeItem('secondsSpentRefining', roundedTime);
+      storeItem('secondsSpentRefining', secondsSpentRefining);
       lastRefiningTimeStored = roundedTime;
     }
   }
