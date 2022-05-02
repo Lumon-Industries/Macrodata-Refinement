@@ -11,7 +11,7 @@ class Data {
     this.refined = false;
     this.binIt = false;
     this.bin = undefined;
-    this.binPauseTime = 30;
+    this.binPauseTime = 8;
     this.binPause = this.binPauseTime;
   }
   
@@ -76,10 +76,10 @@ class Data {
   show() {
     g.textFont('Courier');
     // if the digit is ready to be binned, lerp to a large size proprtional to the pause time
-    const digitSize = this.binIt ? lerp(this.sz, baseSize * 2.5, map(this.binPause, 30, 0, 0, 1)) : this.sz;
+    const digitSize = this.binIt ? lerp(this.sz, baseSize * 2.5, map(this.binPause, this.binPauseTime, 0, 0, 1)) : this.sz;
     g.textSize(digitSize);
     g.textAlign(CENTER, CENTER);
-    
+
     const col = color(this.color);
     col.setAlpha(this.alpha);
     g.fill(col);
