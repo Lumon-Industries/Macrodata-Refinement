@@ -375,6 +375,8 @@ function draw() {
   // image(mdeGIF, 0, 0);
   // pop();
 
+  drawCursor(mouseX, mouseY);
+
   if (useShader) {
     shaderLayer.rect(0, 0, g.width, g.height);
     shaderLayer.shader(crtShader);
@@ -389,6 +391,7 @@ function draw() {
   } else {
     image(g, 0, 0, g.width, g.height);
   }
+
 
   // Displays FPS in top left corner, helpful for debugging
   // drawFPS();
@@ -533,6 +536,26 @@ function toggleShader() {
     palette = shaderPalette;
   }
   useShader = !useShader;
+}
+
+function drawCursor(xPos, yPos) {
+  // prevents the cursor appearing in top left corner on page load
+  if (xPos == 0 && yPos == 0) return;
+  g.push()
+  // this offset makes the box draw from point of cursor 
+  g.translate(xPos+10, yPos+10);
+  g.scale(1.2);
+  g.fill(palette.BG);
+  g.stroke(palette.FG);
+  g.strokeWeight(3);
+  g.beginShape();
+  g.rotate(-PI/5);
+  g.vertex(0, -10);
+  g.vertex(7.5, 10);
+  g.vertex(0, 5);
+  g.vertex(-7.5, 10);
+  g.endShape(CLOSE);
+  g.pop();
 }
 
 function windowResized(ev) {
