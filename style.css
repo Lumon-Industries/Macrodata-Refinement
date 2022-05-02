@@ -6,6 +6,7 @@ body {
 canvas {
   display: block;
   touch-action: none;
+  cursor: none;
 }
 
 div {
