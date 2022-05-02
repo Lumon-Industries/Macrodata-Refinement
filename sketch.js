@@ -175,8 +175,8 @@ function setup() {
       }
       thenumbers += '\n';
     }
-    const timeStr = completedTime.toLocaleString('en-US');
-    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) in ${timeStr} milliseconds I have brought glory to the company.
+    const timeStr = (secondsSpentRefining/60).toFixed(2).toLocaleString('en-US');
+    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) in ${timeStr} minutes I have brought glory to the company.
 Praise Kier.
 ${thenumbers}#mdrlumon #severance 🧇🐐🔢💯
 lumon-industries.com`;
