@@ -1,13 +1,35 @@
-html,
-body {
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
   margin: 0;
   padding: 0;
+}
+
+
+html,
+body {
+  height: 100%;
+
+  background-color: #010A13;
+  color: #ABFFE9;
+  font-family: sans-serif;
+  
 }
 canvas {
   display: block;
   touch-action: none;
+  cursor: none;
 }
 
 div {
   cursor: pointer;
+}
+
+.loadingclass {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
 }
