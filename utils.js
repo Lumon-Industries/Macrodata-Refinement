@@ -25,5 +25,8 @@ const isTouchScreenDevice = () => {
 }
 // Takes a value in seconds, returns hh:mm:ss:ms
 const createTimeString = (seconds) => {
-  return new Date(seconds * 1000).toISOString().substring(11, 23);
+  const baseString = new Date(seconds * 1000).toISOString().substring(11, 23);
+  const hhmm = baseString.split(':');
+  const ssms = hhmm[2].split('.');
+  return `${hhmm[0]}h ${hhmm[1]}m ${ssms[0]}s ${ssms[1]}ms`;
 }
