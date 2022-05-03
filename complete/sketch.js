@@ -1,36 +1,50 @@
-// Created for https://github.com/Lumon-Industries/Macrodata-Refinement
+/ Created for https://github.com/Lumon-Industries/Macrodata-Refinement
 
 // a shader variable
-let theShader;
+let completeShader;
+let speech;
 
 function preload(){
   // load the shader
-  theShader = loadShader('starter.vert', 'starter.frag');
+  completeShader = loadShader('completeShader.vert', 'completeShader.frag');
 }
 
 
 function setup() {
   pixelDensity(1);
   // shaders require WEBGL mode to work
-  createCanvas(800, 800, WEBGL);
+  createCanvas(500, 500, WEBGL);
   noStroke();
+  speech = new p5.Speech(voiceReady);
+  
+  function voiceReady() {
+    console.log(speech.voices);
+  }
+  
+  speech.setVoice('Vicki');
+  speech.setVolume(0.25);
+  speech.speak(' I knew you could do it.  You have brought glory to the company. I love you.');
 }
 
 
 function draw() {  
   background(0);
 
-  // send resolution of sketch into shader
-  theShader.setUniform('u_resolution', [width, height]);
-  theShader.setUniform("iMouse", [mouseX, map(mouseY, 0, height, height, 0)]);
-  theShader.setUniform("iFrame", frameCount);
-  theShader.setUniform("iTime", millis()/1000.);
+  // Send uniforms of sketch into shader
+  completeShader.setUniform('u_resolution', [width, height]);
+  completeShader.setUniform("iMouse", [mouseX, map(mouseY, 0, height, height, 0)]);
+  completeShader.setUniform("iFrame", frameCount);
+  completeShader.setUniform("iTime", millis()/1000.);
   
   // shader() sets the active shader with our shader
-  shader(theShader);
-  //model(cubeObj);
+  shader(completeShader);
+ 
   // rect gives us some geometry on the screen
   rect(0,0,width, height);
   
+//   speech.ended(endSpeaking);
+//   function endSpeaking() {
+//   background(0);
+// }
 }
 
