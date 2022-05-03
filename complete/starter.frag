@@ -1,4 +1,5 @@
-// Starting point for frag code is the "RayMarching starting point" and "Over the Moon"
+// Starting point for frag code is the "RayMarching starting point"
+// Layer effect described in  "Over the Moon" tutorial
 // by Martijn Steinrucken aka The Art of Code/BigWings - 2020
 // YouTube: youtube.com/TheArtOfCodeIsCool
 
@@ -13,31 +14,43 @@ uniform vec2 u_resolution;
 uniform float iTime;
 uniform vec2 iMouse;
 uniform int iFrame;
+vec2 curvature = vec2(4.5);
 
 #define PI 3.1415
+#define E 2.71828182846
 #define S(x,y,z) smoothstep(x,y,z)
 #define B(x,y,z,b) S(x, x+b, z)*S(y+b, y, z)
 #define saturate(x) clamp(x,0.,1.)
-#define BG backgroundGradient
+#define CG colorGradient
 #define DL diagonalLine
 #define MOD3 vec3(.1031,.11369,.13787)
 
+
 // Initial color for screen
- #define NAVY vec3(7,5,96)/255.
+#define NAVY vec3(32,33,83)/255.
+#define AQUA vec3(171,255,233)/255.
+
 
 // Define colors scheme
-#define LTBROWN vec3(170, 124, 100)/255.
-#define DKBROWN vec3(50,42,38)/255.
+// I needed to use exaggerated colors for the sky to avoid ending up with dull colors
+#define GREY vec3(153, 138, 119)/255.
+#define BROWN vec3(102,67,36)/255.
+#define BEIGE vec3(242,170,158)/255.
 #define PINKER vec3(255, 57, 255)/255.
-#define YELLOW vec3(242,214,65)/255.
+#define YELLOW vec3(255,240,90)/255.
 
-
-// Beginning of terrain shader
 // Function to add background color
-vec3 backgroundGradient(vec2 uv, vec3 col1, vec3 col2, float m) {
+vec3 colorGradient(vec2 uv, vec3 col1, vec3 col2, float m) {
   float k = uv.y*m + m;
   vec3 col = mix(col1, col2, k);
   return col;
+}
+
+
+// Rotation matrix
+mat2 Rot(float a) {
+    float s=sin(a), c=cos(a);
+    return mat2(c, -s, s, c);
 }
 
 vec3 gradient(vec3 uv, vec3 col1, vec3 col2, float m) {
@@ -46,7 +59,8 @@ vec3 gradient(vec3 uv, vec3 col1, vec3 col2, float m) {
   return col;
 }
 
-// From from Inigo Quilez
+// Basic sdf functions from Inigo Quilez
+// https://iquilezles.org/articles/distfunctions2d/
 float sdSegment( vec2 uv, vec2 a, vec2 b) {
   vec2 pa = uv-a, ba = b-a;
   float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
@@ -61,7 +75,6 @@ float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
     return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;
 }
 
-// From from Inigo Quilez
 float sdEllipse( in vec2 p, in vec2 ab )
 {
     p = abs(p); if( p.x > p.y ) {p=p.yx;ab=ab.yx;}
@@ -104,6 +117,7 @@ float sdBox( vec2 uv, vec2 b )
     return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
 }
 
+// Functions to create 100%
 float Zero( vec2 uv, float r) {
   return abs( sdEllipse( uv, vec2(.0425,.085)) ) - .001;
 }
@@ -116,7 +130,6 @@ vec3 sdOutline( vec2 uv) {
   float m2 = S(.008, .0, d2);
   return col += m1 + m2;
 }
-
 
 vec3 percent( vec2 uv, float scale ) {
    vec3 col = vec3(0);
@@ -174,13 +187,42 @@ float sdCloud2( vec2 uv, float x, float y) {
    return max(m5, m6);
 }
 
-float smax( in float a, in float b, float k)
-{
- float h = max( k - abs(a-b), 0.0); 
- return max(a,b) + h*h*0.25/k;
+// Code to create mountains
+// Psuedo random noise code from Over the Moon Tutorial
+float getHeight(float x) {
+//  return sin(x) + sin(x*2.234+.123)*.5 + sin(x*4.45+2.2345)*.25;
+ return sin(x)  + sin(x*2.234 + 0.123)*cos(x) + sin(x*4.45 + 2.234)*.25;
 }
 
-// Noise functions from Inigo Quilez; used to create CRT effect
+// vec4 Layer(vec2 uv, float blur)
+//   {
+//      vec4 col = vec4(0); 
+//      float x = abs(uv.x);
+//      float y = getHeight(uv.x);
+//      float m =  S(blur, -blur, uv.y + y);
+//      return col + m;
+//  }
+
+vec4 landscape(vec2 uv, float d, float p, float f, float a, float y, float seed, float focus) {
+	uv *= d;
+    vec2 gv = 0.04*Rot(PI*1./16.)*uv;
+    vec2 hv = 0.02*Rot(-PI*1./32.)*uv;
+    //uv *= d;
+    float x1 = uv.x*PI*f+ p;
+    float x2 = gv.x*PI*f - 1.573*p;
+    float x3 = gv.x*PI*f + 3.139*p;
+    float c = getHeight(x1+x2+x3)*a+y;
+    float x = uv.x*PI*f+p;
+    float e = 0.001;//fwidth(uv.y);
+    vec4 col = vec4(S(c+e, c-e, uv.y ));
+    col.rgb *= mix(0.9, 1., abs(uv.y-c)*20.);
+  
+    return saturate(col);
+}
+
+// Code to create dissolve
+// Noise functions from Inigo Quilez
+
 float N21( vec2 p) {
     return fract( sin(p.x*100. + p.y*6574.)*5674. );
 }
@@ -260,57 +302,12 @@ float noise(vec2 uv) {
   vec2 i = floor(uv);
   vec2 f = fract(uv);
   float a = random(i);
-  float b = random(i + vec2(1.,0.));
-  float c = random( i + vec2(0., 1.));
-  float d = random(i + vec2(1.));
+  float b = random(i + vec2(1.0,0.0));
+  float c = random( i + vec2(0.0, 1.0));
+  float d = random(i + vec2(1.0));
   
-  vec2 u = S(0., 1., f);
-  return mix(a, b, u.x) + (c-a)*u.y * (1. - u.x) + (d-b) * u.x*u.y;
-}
-
-
-// Use psuedo random noise to get the height of the mountains
-float getHeight(float x) {
-//  return sin(x) + sin(x*2.234+.123)*.5 + sin(x*4.45+2.2345)*.25;
- return sin(x)  + sin(x*2.234 + .123)*cos(x) + sin(x*4.45 + 2.234)*.25;
-}
-
-vec4 Layer(vec2 uv, float blur)
-  {
-     vec4 col = vec4(0); 
-     float x = abs(uv.x);
-     float y1 = getHeight(uv.x);
-     //float y2 = (1. - x) * pow(x, 2.) + x * (1. - pow(x, 2.));
-     //float y = smax(y1, y2, .2);
-     float m =  S(blur, -blur, uv.y + y1);
-     // float y2 = (1. - x) * pow(x, 2.) + x * (1. - pow(x, 2.));
-     // float y = smax(y1, y2, .2);
-     // float m =  S(blur, -blur, uv.y + 1.2*y);
-     return col + m;
- }
-
-// Functions to create crt filter
-vec2 crt_coords( vec2 uv, float bend) {
-    uv -= 0.5;
-    uv *= 2.;
-    uv.x *= 1. + pow(abs(uv.y)/bend, 2.);
-    uv.y *= 1. + pow(abs(uv.x)/bend, 2.);
-    uv /= 2.;
-    return uv+.5;
-}
-
-float vignette(vec2 uv, float size, float smoothness, float edgeRounding)
-  {
-  uv -= .5;
-  uv *= size;
-  float amount = sqrt(pow(abs(uv.x), edgeRounding) + pow((uv.y), edgeRounding));
-  amount = 1. - amount;
-  return S(0., smoothness, amount);
-}
-
-float scanline( vec2 uv, float lines, float speed) {
-  return sin(uv.y*lines + iTime * speed);
-  
+  vec2 u = S(0.0, 1.0, f);
+  return mix(a, b, u.x) + (c-a)*u.y * (1.0 - u.x) + (d-b) * u.x*u.y;
 }
 
 // Function to create dissolve effect
@@ -327,66 +324,123 @@ float rule(vec2 p)
     return f;
 }
 
+// Functions to create crt filter
+vec2 crt_coords( vec2 uv, float bend) {
+    uv -= 0.5;
+    uv *= 2.;
+    uv.x *= 1.0 + pow(abs(uv.y)/bend, 2.0);
+    uv.y *= 1.0 + pow(abs(uv.x)/bend, 2.0);
+    uv /= 2.0;
+    return uv+0.5;
+}
+
+float vignette(vec2 uv, float size, float smoothness, float edgeRounding)
+  {
+  uv -= 0.5;
+  uv *= size;
+  float amount = sqrt(pow(abs(uv.x), edgeRounding) + pow((uv.y), edgeRounding));
+  amount = 1.0 - amount;
+  return S(0.0, smoothness, amount);
+}
+  
 void main( )
 {
 	vec2 uv = gl_FragCoord.xy / u_resolution.y;
   
     // Create new uv for 100% 
-    vec2 gv = (gl_FragCoord.xy-.5*u_resolution.xy) / u_resolution.y;
+    vec2 gv = (gl_FragCoord.xy-0.5*u_resolution.xy) / u_resolution.y;
   
     // Code for CRT filter
-    vec2 crt_uv = crt_coords(uv, 4.) ; 
-    float f = fbm2( 6.0 * crt_uv ); // Adjust parameter here to make variation more pronounced
+    //vec2 crt_uv = curveRemapUV(uv);
+  
+    vec2 crt_uv = crt_coords(uv, 4.5) ; 
+  
+    // Add scan lines
+    float line_count = 300.0;
+    float opacity = 0.75;
+    float y_lines = sin(crt_uv.y * line_count * PI * 2.0);
+    y_lines = (y_lines * 0.5 + 0.5) * 0.9 + 0.1;
+    float x_lines = sin(crt_uv.x * line_count * PI * 2.0);
+    x_lines = (x_lines * 0.5 + 0.5) * 0.9 + 0.1;
+    vec4 scan_line = vec4(vec3(pow(y_lines, opacity)), 1.0);
+    vec4 scan_line_x = vec4(vec3(pow(x_lines, opacity)), 1.0);
+  
+    
+   // Adjust parameter here to make variation more pronounced
+    float f = fbm2( 6.0 * crt_uv ); 
     
     // Code for dissolve filter
     float rule = rule(uv);
-    float p0 = S(rule, rule + 0.25, iTime*.33);
-    float t = iTime*.04;
+    float p0 = S(rule, rule + 0.25, iTime*0.75);
+    float t = iTime*0.04;
     
-   // Add a target for the camera
+    // Add a target for the camera
     vec3 ta = vec3(0.0,0.0,0.0);
+  
+    // Origin of camera (ta moves camera up)
+    vec3 ro = ta + vec3(1.5*sin(iTime),0.0,1.0*cos(iTime));  
     
-    vec3 ro = ta + vec3(1.5*sin(iTime),0.0,-1.5*cos(iTime));  // origin of camera (ta moves camera up)
-    
-    vec3 ww = normalize( ta - ro); // target minus ray origin
-    vec3 uu = normalize( cross(ww,vec3(0.,1.,0.)) );
+    // Target minus ray origin
+    vec3 ww = normalize( ta - ro); 
+    vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0)) );
     vec3 vv = normalize( cross(uu,ww) );
     
-    vec3 rd = normalize( gv.x*uu + gv.y*vv + 1.5*ww );  // lens of camera
-    
+  // Lens of camera
+    //vec3 rd = normalize( gv.x*uu + gv.y*vv + 1.0*ww*pow(E, 1.0*iTime));  
+     vec3 rd = normalize( gv.x*uu + gv.y*vv + 40.0*ww*pow(E, iTime)); 
+  
     // Start scene with 100%
     vec3 col = NAVY;  
-    col = complete(gv);
-    vec4 color = vec4(col, 1.);
-    
-    vec4 col_alpha = vec4(BG(crt_uv, YELLOW, PINKER, .3) - 0.5*rd.y, 1.); // sky with gradient 
+    col += complete(gv)*AQUA;
+    vec4 color = vec4(col, 1.0);
+    color *= scan_line;
+    color *= scan_line_x;
   
-    // Create mountains
-    float blur = .005;
-    for(float i=0.; i<1.; i+=1./20.) {  
-        float scale = mix(2.5, 1., i*.5);  // make layers further away smaller
-       float m = t*.1 + i + .05;
-      // vec4 layer = Layer(crt_uv*scale+vec2(t+ i*75., m), blur); // add paralax
-       vec4 layer = Layer(uv*scale+vec2( i*75., iTime *.1*i), blur); 
-        // Add some brown color for the mountains
-        // Make more distant peaks lighter in color
-       
-    	layer.rgb *= (1. - i)*LTBROWN; 
+    // Start of mountain scene
+    vec3 bkgrcol = CG(crt_uv, YELLOW, PINKER, 0.3);
+    vec4 col_alpha = vec4(bkgrcol- 0.5*rd.y, 1.0); // sky with gradient 
+ 
+    float dist = .1;
+    float height = -.01;
+    float amplitude = .07;
+    
+    dist = 1.0; // adjusts placement on screen
+    height = 0.395;
+    
+    vec4 layers = vec4(0.);
+    for(float i=0.; i<14.; i+=3.) {    
+    	vec4 layer = landscape(uv - vec2(0.0, -0.004*pow(iTime, 2.0)), dist, t+i, 3.0, amplitude, height, i, .01);
+        //layer.rgb *= mix( GREY, bkgrcol, clamp(0.0, 1.-i/10., 0.7) );
+        layer.rgb *= mix( BROWN, bkgrcol, clamp(0.0, 1.-i/10., 0.7) );
+        layers = mix(layers, layer, layer.a);
         
-        col_alpha = mix(col_alpha, layer, layer.a); // Mix the sky with the mountains
+        dist -= .1;
+        height -= .006*pow(iTime, 2.2);//*.15;
+       // height -= .005*iTime;
     }
+   
+    col_alpha = col_alpha*(1.- layers.a) + mix(col_alpha, layers, layers.a);
+    
   
     // Add clouds to sky
-    vec3 c1 = sdCloud1(crt_uv, -t + .9 , .85)*vec3(1.0);
-    vec4 cloud1 = vec4(c1, 1.);
-    vec3 c2 = sdCloud2(crt_uv, -t + .6 , .75)*vec3(1.0);
-    vec4 cloud2 = vec4(c2, 1.);
-    vec3 c3 = sdCloud1(crt_uv, -t + 1.4 , .80)*vec3(1.0);
-    vec4 cloud3 = vec4(c3, 1.);
-    col_alpha += cloud1 + cloud2 + cloud3;
+    vec3 c0 = sdCloud2(crt_uv, -t + 0.2 , 0.85)*vec3(1.0);
+    vec4 cloud0 = vec4(c0, 1.0);
+    vec3 c1 = sdCloud1(crt_uv, -t + 0.6 , 0.775)*vec3(1.0);
+    vec4 cloud1 = vec4(c1, 1.0);
+    vec3 c2 = sdCloud2(crt_uv, -t + 1.0 , 0.725)*vec3(1.0);
+    vec4 cloud2 = vec4(c2, 1.0);
+    vec3 c3 = sdCloud1(crt_uv, -t + 1.4 , 0.65)*vec3(1.0);
+    vec4 cloud3 = vec4(c3, 1.0);
+    vec3 c4 = sdCloud2(crt_uv, -t + 1.8 , 0.60)*vec3(1.0);
+    vec4 cloud4 = vec4(c4, 1.0);
+    vec3 c5 = sdCloud1(crt_uv, -t + 2.1 , 0.860)*vec3(1.0);
+    vec4 cloud5 = vec4(c5, 1.0);
+    col_alpha += cloud0 +cloud1 + cloud2 + cloud3 + cloud4 + cloud5;
   
     
-    float s1 = scanline(uv, 900., -2.);
-    gl_FragColor = mix(col_alpha, vec4(s1), 0.2)*vignette(uv, 1.5, .6, 10.) ;
+    col_alpha *= scan_line;
+    col_alpha *= scan_line.x;
+   
+    gl_FragColor = col_alpha*vignette(uv, 1.5, .6, 10.) ;
     gl_FragColor = mix(color, gl_FragColor, p0);
 }
