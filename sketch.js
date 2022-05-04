@@ -17,6 +17,8 @@ let refineTX, refinteTY, refineBX, refineBY;
 let lumon;
 
 let startTime = 0;
+let secondsSpentRefining = 0;
+let lastRefiningTimeStored = 0;
 
 const emojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
 
@@ -111,6 +113,9 @@ function startOver(resetFile = false) {
 
   if (resetFile) {
     macrodataFile.resetFile();
+    storeItem('secondsSpentRefining', 0);
+    secondsSpentRefining = 0;
+    lastRefiningTimeStored = 0;
   }
 
   // Refinement bins
@@ -161,6 +166,7 @@ function setup() {
   smaller = min(g.width, g.height);
 
   macrodataFile = new MacrodataFile();
+  secondsSpentRefining = getItem('secondsSpentRefining') ?? 0;
 
   sharedImg.resize(smaller * 0.5, 0);
   nopeImg.resize(smaller * 0.5, 0);
@@ -183,8 +189,8 @@ function setup() {
       }
       thenumbers += '\n';
     }
-    const timeStr = completedTime.toLocaleString('en-US');
-    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) in ${timeStr} milliseconds I have brought glory to the company.
+    const timeStr = createTimeString(secondsSpentRefining);
+    const msg = `In refining ${macrodataFile.coordinates} (${macrodataFile.fileName}) in ${timeStr} I have brought glory to the company.
 Praise Kier.
 ${thenumbers}#mdrlumon #severance 🧇🐐🔢💯
 lumon-industries.com`;
@@ -197,12 +203,6 @@ lumon-industries.com`;
     shared = true;
     //}
   });
-
-  // for (let i = 0; i < 1; i++) {
-  //   loadImage('mde.gif', (img) => {
-  //     mdeGIF[i] = img;
-  //   });
-  // }
 
   startOver();
 }
@@ -368,12 +368,6 @@ function draw() {
       yoff += 5;
     }
   }
-  // push();
-  // imageMode(CENTER);
-  // translate(width * 0.5, height * 0.5);
-  // rotate(frameCount * 0.05);
-  // image(mdeGIF, 0, 0);
-  // pop();
 
   drawCursor(mouseX, mouseY);
 
@@ -392,7 +386,14 @@ function draw() {
     image(g, 0, 0, g.width, g.height);
   }
 
-
+  if (focused) {
+    secondsSpentRefining += deltaTime / 1000;
+    const roundedTime = round(secondsSpentRefining);
+    if (roundedTime % 5 == 0 && roundedTime != lastRefiningTimeStored) {
+      storeItem('secondsSpentRefining', secondsSpentRefining);
+      lastRefiningTimeStored = roundedTime;
+    }
+  }
   // Displays FPS in top left corner, helpful for debugging
   // drawFPS();
 }
