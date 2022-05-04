@@ -1,4 +1,4 @@
-/ Created for https://github.com/Lumon-Industries/Macrodata-Refinement
+// Created for https://github.com/Lumon-Industries/Macrodata-Refinement
 
 // a shader variable
 let completeShader;
