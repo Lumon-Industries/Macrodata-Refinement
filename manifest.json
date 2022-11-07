@@ -1,0 +1,15 @@
+{
+	"$schema": "https://json.schemastore.org/web-manifest-combined.json",
+	"name": "Lumon Industries",
+	"short_name": "Lumon",
+	"start_url": "/",
+	"display": "standalone",
+	"Scope": "/",
+	"background_color": "#062731",
+	"description": "Macrodata Refinement",
+	"icons": [{
+		"src": "images/icon.png",
+		"sizes": "192x192",
+		"type": "image/png"
+	}]
+}
