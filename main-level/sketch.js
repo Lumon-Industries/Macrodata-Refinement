@@ -223,6 +223,7 @@ class Dot {
     this.y = y;
     this.r = r;
     this.going = false;
+    this.speed = 20;
   }
 
   show() {
@@ -234,7 +235,7 @@ class Dot {
 
   update() {
     if (this.going) {
-      this.y += 10;
+      this.y += this.speed;
       const total = buckets[this.i].dots.length;
       const boundary = g.height - yLine * 0.25 - this.r * 0.8 - this.r * total * 1.25;
       if (this.y > boundary) {
