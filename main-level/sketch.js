@@ -89,6 +89,9 @@ function keyPressed() {
 
 function draw() {
   g.background(palette.BG);
+  g.push();
+  const diff = g.width - fullW;
+  g.translate(diff / 2, 0);
   g.rectMode(CORNER);
   g.stroke(palette.FG);
 
@@ -194,6 +197,7 @@ function draw() {
     buckets[i].show();
   }
 
+  g.pop();
   for (let i = 0; i < columns; i++) {
     if (useShader) {
       shaderLayer.rect(0, 0, g.width, g.height);
