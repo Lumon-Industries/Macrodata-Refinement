@@ -40,9 +40,12 @@ const buckets = [];
 let yLine;
 let w;
 let smaller;
+let fullW;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  fullW = min(windowWidth, 1280);
+
   frameRate(30);
 
   // create a downscaled graphics buffer to draw to, we'll upscale after applying crt shader
@@ -66,11 +69,11 @@ function setup() {
 
   smaller = min(g.width, g.height);
 
-  yLine = g.height / 5;
-  w = g.width / columns;
+  yLine = g.height / 4;
+  w = fullW / columns;
   for (let i = 0; i < columns; i++) {
-    const x = (i * g.width) / columns + g.width / columns / 2;
-    const y = yLine * 1.25;
+    const x = (i * fullW) / columns + fullW / columns / 2;
+    const y = yLine + w * 0.5;
     dots.push(new Dot(i, x, y, w * 0.5));
     buckets.push(new Bucket(i, 0));
   }
@@ -91,22 +94,22 @@ function draw() {
 
   // Frame
   g.strokeWeight(3);
-  g.line(0, yLine, g.width, yLine);
+  g.line(0, yLine, fullW, yLine);
   for (let i = 0; i < columns + 1; i++) {
-    g.line(i * w, yLine, i * w, yLine * 1.5);
+    g.line(i * w, yLine, i * w, yLine + w * 1);
   }
 
-  g.line(0, g.height - yLine * 0.5, g.width, g.height - yLine * 0.5);
+  g.line(0, g.height - yLine * 0.25, fullW, g.height - yLine * 0.25);
   for (let i = 0; i < columns + 1; i++) {
-    g.line(i * w, g.height - yLine * 0.5, i * w, g.height - yLine * 1.5);
+    g.line(i * w, g.height - yLine * 0.25, i * w, g.height - yLine * 0.25 - w * 2);
   }
 
   // Top Bar
   const topBarTotal = 11;
-  const topBarSpacing = g.width / topBarTotal;
-  const y = yLine * 0.5;
+  const topBarSpacing = fullW / topBarTotal;
+  const y = yLine * 0.4;
   for (let i = 0; i < topBarTotal; i++) {
-    const x = topBarSpacing * i + i * 0.5 * (topBarSpacing - w);
+    const x = topBarSpacing * i + (i / topBarTotal) * (topBarSpacing - w);
     if (i == 0 || i > topBarTotal - 4) {
       g.noFill();
       g.strokeWeight(3);
@@ -162,14 +165,14 @@ function draw() {
     }
   }
 
-  g.line(topBarSpacing, y, topBarSpacing * 9 - w * 0.25, y);
-  g.line(topBarSpacing, y + w, topBarSpacing * 9 - w * 0.25, y + w);
+  g.line(topBarSpacing, y, topBarSpacing * 8 - topBarSpacing / topBarTotal, y);
+  g.line(topBarSpacing, y + w, topBarSpacing * 8 - topBarSpacing / topBarTotal, y + w);
 
   g.fill(palette.FG);
   g.noStroke();
   g.textSize(24);
   g.textAlign(CENTER, CENTER);
-  g.text('⇦ MAIN LEVEL ⇨', g.width / 2, yLine * 0.25);
+  g.text('⇦ MAIN LEVEL ⇨', fullW / 2, yLine * 0.25);
 
   for (let i = columns - 1; i >= 0; i--) {
     if (!dots[i]) continue;
@@ -179,8 +182,8 @@ function draw() {
       dots[i] = null;
       for (let j = 0; j < columns; j++) {
         if (!dots[j] && buckets[j].dots.length < 3 && random(1) < 0.25) {
-          const x = (j * g.width) / columns + g.width / columns / 2;
-          const y = yLine * 1.25;
+          const x = (j * fullW) / columns + fullW / columns / 2;
+          const y = yLine + w * 0.5;
           dots[j] = new Dot(j, x, y, w * 0.5);
         }
       }
@@ -229,7 +232,7 @@ class Dot {
     if (this.going) {
       this.y += 10;
       const total = buckets[this.i].dots.length;
-      const boundary = g.height - yLine * 0.5 - this.r - this.r * total * 1.25;
+      const boundary = g.height - yLine * 0.25 - this.r * 0.8 - this.r * total * 1.25;
       if (this.y > boundary) {
         this.y = boundary;
         this.going = false;
