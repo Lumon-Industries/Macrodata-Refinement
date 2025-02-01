@@ -69,12 +69,7 @@ class MacrodataFile {
     }
     let x = randHex() + randHex() + randHex();
     let y = randHex() + randHex() + randHex();
-#generateCoordinates() {
-    function randHex() {
-      return floor(random(0, 256)).toString(16).toUpperCase().padStart(2, '0');
-    }
-    let x = randHex() + randHex() + randHex();
-    let y = randHex() + randHex() + randHex();
+    
     return `0x${x} : 0x${y}`;
   }
 }
