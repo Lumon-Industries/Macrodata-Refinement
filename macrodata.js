@@ -69,6 +69,7 @@ class MacrodataFile {
     }
     let x = randHex() + randHex() + randHex();
     let y = randHex() + randHex() + randHex();
-    return `${x}:${y}`;
+    
+    return `0x${x} : 0x${y}`;
   }
 }
