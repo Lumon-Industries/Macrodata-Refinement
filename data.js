@@ -1,3 +1,9 @@
+let TTFors;
+
+function preload() {
+  TTFors = loadFont('fonts/TTForsMedium.ttf');  // ttf needs to be added to files
+}
+
 class Data {
   constructor(x, y) {
     this.num = floor(random(10));
@@ -74,7 +80,7 @@ class Data {
   }
 
   show() {
-    g.textFont('Courier');
+    g.textFont(TTFors);
     // if the digit is ready to be binned, lerp to a large size proprtional to the pause time
     const digitSize = this.binIt ? lerp(this.sz, baseSize * 2.5, map(this.binPause, this.binPauseTime, 0, 0, 1)) : this.sz;
     g.textSize(digitSize);

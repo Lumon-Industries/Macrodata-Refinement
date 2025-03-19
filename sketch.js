@@ -79,6 +79,8 @@ let palette = mobilePalette;
 
 // holds filename, initial bin levels, coordinates
 let macrodataFile;
+let TTFors;
+
 
 function preload() {
   lumon = loadImage('images/lumon.png');
@@ -86,6 +88,7 @@ function preload() {
   completedImg = loadImage('images/100.png');
   sharedImg = loadImage('images/clipboard.png');
   mdeGIF[0] = loadImage('images/mde.gif');
+  TTFors = loadFont('fonts/TTForsMedium.ttf'); // ttf needs to be added to files
 
   crtShader = loadShader('shaders/crt.vert.glsl', 'shaders/crt.frag.glsl');
 }
@@ -304,7 +307,7 @@ function draw() {
   }
 
   g.background(palette.BG);
-  g.textFont('Courier');
+  g.textFont(TTFors);
 
   drawTop(percent);
   drawNumbers();
@@ -419,7 +422,7 @@ function drawTop(percent) {
   g.stroke(palette.FG);
   g.strokeWeight(4);
   g.textSize(32);
-  g.textFont('Arial');
+  g.textFont('Arial Bold');
   g.text(`${floor(nf(percent * 100, 2, 0))}% Complete`, w * 0.8, 50);
   if (macrodataFile) {
     g.fill(palette.FG);

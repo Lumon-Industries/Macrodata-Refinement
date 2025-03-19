@@ -117,7 +117,7 @@ class Bin {
 
   writeIndex() {
     g.textSize(18);
-    g.textFont('Arial');
+    g.textFont('Arial Bold');
     g.textAlign(CENTER, CENTER);
     g.fill(palette.FG);
     g.noStroke();
